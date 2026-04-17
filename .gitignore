@@ -1,0 +1,7 @@
+# --- Root/General ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.sublime-workspace
+*.log
