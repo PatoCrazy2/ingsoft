@@ -180,3 +180,13 @@ chore(deps): actualizar Angular a v20.3
 > ⚠️ **SIEMPRE** crear Pull Requests para cualquier merge entre ramas.
 >
 > ⚠️ Antes de crear un PR, hacer `git pull` de la rama destino para evitar conflictos.
+
+## 🔐 Credenciales de Desarrollo (Local)
+
+Para acceder al panel de administración y probar la API en tu entorno local:
+- **URL Admin:** [http://localhost:8000/admin](http://localhost:8000/admin)
+- **Usuario:** `admin@rehabweb.local`
+- **Password:** `adminpassword123`
+
+> [!WARNING]
+> Estas credenciales son solo para uso en desarrollo local. Nunca compartas credenciales de servidores de producción en este archivo.
