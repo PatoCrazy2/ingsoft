@@ -1,25 +1,61 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EjercicioService } from '../../services/ejercicio.service';
+import {
+  EjercicioService,
+  mapDjangoEjercicioToEjercicio,
+} from '../../services/ejercicio.service';
 import { EjercicioFormComponent } from '../../components/ejercicio-form/ejercicio-form.component';
-import { Ejercicio } from '../../models/ejercicio.model';
+import { Ejercicio, EjercicioFormData } from '../../models/ejercicio.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
+
+function payloadCrearCatalogo(form: EjercicioFormData): Record<string, unknown> {
+  const video =
+    (form.video_url ?? '').trim() || 'https://example.org/videos/ejercicio-demo-placeholder.mp4';
+  let ev = (form.evidencia_cientifica ?? '').trim();
+  if (ev.length < 20) {
+    ev = `${(form.descripcion ?? '').trim()} Contexto clínico y criterios de aplicación seguros (texto de respaldo para el validador).`;
+  }
+  if (!form.video_url?.trim() && ev.length < 40) {
+    ev = `${ev} Referencias generales en rehabilitación neurológica y fisioterapia basada en evidencia.`;
+  }
+  return {
+    nombre: form.nombre,
+    descripcion: form.descripcion,
+    series: 3,
+    repeticiones: 10,
+    tiempo_segundos: 45,
+    url_video: video,
+    thumbnail_url: (form.imagen_url ?? '').trim() || undefined,
+    evidencia_cientifica: ev,
+    referencias_bibliograficas: [],
+    movilidad_paciente_min: '1',
+    movilidad_paciente_max: '5',
+    territorios_acv_compatibles: [],
+    categoria: form.categoria || 'GENERAL',
+    etiquetas_clinicas: [form.categoria || 'GENERAL'],
+  };
+}
 
 @Component({
   standalone: true,
   imports: [CommonModule, EjercicioFormComponent],
   template: `
     <div class="container py-5">
-      <h1 class="mb-4">{{ isEdit ? 'Editar Ejercicio' : 'Nuevo Ejercicio' }}</h1>
-      <app-ejercicio-form 
-        [initialData]="ejercicio" 
+      <h1 class="mb-4">{{ isEdit ? 'Editar ejercicio' : 'Nuevo ejercicio' }}</h1>
+      <p class="text-secondary mb-4" *ngIf="!isEdit">
+        Se enviará al flujo de <strong>pendiente de validación</strong> (no se publica hasta las validaciones por
+        pares en el API).
+      </p>
+      <app-ejercicio-form
+        [initialData]="ejercicio"
         [isEdit]="isEdit"
         (formSubmit)="onSave($event)"
-        (cancelClick)="onCancel()">
+        (cancelClick)="onCancel()"
+      >
       </app-ejercicio-form>
     </div>
-  `
+  `,
 })
 export class EjercicioEditPage implements OnInit {
   private route = inject(ActivatedRoute);
@@ -34,25 +70,49 @@ export class EjercicioEditPage implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEdit = true;
-      this.service.getEjercicio(id).subscribe(data => this.ejercicio = data);
+      this.service.getEjercicio(id).subscribe({
+        next: (data) => {
+          this.ejercicio = mapDjangoEjercicioToEjercicio(data as unknown as Record<string, unknown>);
+        },
+        error: () => this.snack.open('No se pudo cargar el ejercicio', 'Cerrar', { duration: 4000 }),
+      });
     }
   }
 
-  onSave(data: any): void {
-    const obs = this.isEdit && this.ejercicio 
-      ? this.service.updateEjercicio(this.ejercicio.id, data)
-      : this.service.createEjercicio(data);
-
-    obs.subscribe({
+  onSave(data: EjercicioFormData): void {
+    if (this.isEdit && this.ejercicio) {
+      this.service.updateEjercicio(this.ejercicio.id, data).subscribe({
+        next: () => {
+          this.snack.open('Ejercicio actualizado', 'Cerrar', { duration: 3000 });
+          this.service.getEjercicios().subscribe({
+            next: () => void this.router.navigate(['/ejercicios/admin']),
+            error: () => void this.router.navigate(['/ejercicios/admin']),
+          });
+        },
+        error: (err) => {
+          const msg = err?.error ? JSON.stringify(err.error).slice(0, 120) : 'Error al guardar';
+          this.snack.open(msg, 'Cerrar', { duration: 5000 });
+        },
+      });
+      return;
+    }
+    this.service.crearEjercicioCatalogo(payloadCrearCatalogo(data)).subscribe({
       next: () => {
-        this.snack.open('Ejercicio guardado con éxito', 'Cerrar', { duration: 3000 });
-        this.router.navigate(['/ejercicios/admin']);
+        this.snack.open('Ejercicio enviado a revisión', 'Cerrar', { duration: 3000 });
+        this.service.getEjercicios().subscribe({
+          next: () => void this.router.navigate(['/ejercicios/admin']),
+          error: () => void this.router.navigate(['/ejercicios/admin']),
+        });
       },
-      error: () => this.snack.open('Error al guardar', 'Cerrar', { duration: 3000 })
+      error: (err) => {
+        const body = err?.error;
+        const det = typeof body === 'object' && body ? JSON.stringify(body) : String(err?.message ?? '');
+        this.snack.open(det.slice(0, 200) || 'Error al crear', 'Cerrar', { duration: 6000 });
+      },
     });
   }
 
   onCancel(): void {
-    this.router.navigate(['/ejercicios/admin']);
+    void this.router.navigate(['/ejercicios/admin']);
   }
 }

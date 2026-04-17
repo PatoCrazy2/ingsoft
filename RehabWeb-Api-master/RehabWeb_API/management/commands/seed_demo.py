@@ -317,6 +317,33 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(f'  · actualizado: {row["nombre"]}')
 
+        Ejercicio.objects.update_or_create(
+            nombre='Movilización activa de tobillo (terapeuta demo)',
+            defaults={
+                'descripcion': (
+                    'Círculos lentos de tobillo en sedestación; ejemplo con **creador = terapeuta demo** '
+                    'para distinguir en biblioteca y admin.'
+                ),
+                'series': 2,
+                'repeticiones': 12,
+                'tiempo_segundos': 30,
+                'url_video': demo_video,
+                'thumbnail_url': img_caminar,
+                'evidencia_cientifica': ev_base,
+                'referencias_bibliograficas': [
+                    {'tipo': 'link', 'url': 'https://example.org/rehab-2023', 'titulo': 'Guía demo'},
+                ],
+                'estado_publicacion': EstadoPublicacion.PUBLICADO,
+                'creador': ut,
+                'movilidad_paciente_min': '2',
+                'movilidad_paciente_max': '5',
+                'territorios_acv_compatibles': [],
+                'categoria': CategoriaEjercicio.MOVILIDAD,
+                'etiquetas_clinicas': ['Tobillo', 'Propiocepción'],
+            },
+        )
+        self.stdout.write('  · ejercicio con creador terapeuta: Movilización activa de tobillo (terapeuta demo)')
+
         self.stdout.write(
             self.style.SUCCESS(
                 'seed_demo: listo. Cuentas (contraseña demo12345): admin@demo.rehab | '

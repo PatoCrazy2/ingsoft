@@ -180,6 +180,29 @@
     font-size: 0.8125rem !important;
     opacity: 0.9;
   }
+
+  &__fail {
+    text-align: center;
+    padding: 1.25rem 1rem;
+    border-radius: 14px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #7f1d1d;
+
+    mat-icon {
+      font-size: 2.25rem;
+      width: 2.25rem;
+      height: 2.25rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.85;
+    }
+
+    p {
+      margin: 0 0 1rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+  }
 }
 
 .nr-field {

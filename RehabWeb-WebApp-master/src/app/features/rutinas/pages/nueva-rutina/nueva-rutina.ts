@@ -45,21 +45,27 @@ export class NuevaRutinaPage implements OnInit {
   constructor() {
     this.auth.sesionLista$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.cargarPacientes());
+      .subscribe(() => this._cargarPacientesTrasSesion());
   }
 
   ngOnInit(): void {
-    this.cargarPacientes();
+    void this.auth.asegurarTokenDemo().then(() => this._cargarPacientesTrasSesion());
   }
 
   cargarPacientes(): void {
+    void this.auth.asegurarTokenDemo().then(() => this._cargarPacientesTrasSesion());
+  }
+
+  private _cargarPacientesTrasSesion(): void {
     this.estado.cargandoPacientes.set(true);
-    this.estado.errorMensaje.set(null);
+    this.estado.errorPacientes.set(null);
+    this.estado.errorEjercicios.set(null);
     this.estado.requiereInicioSesion.set(false);
     this.pacientesApi.listar().subscribe({
       next: (lista) => {
         this.pacientes = lista;
         this.estado.cargandoPacientes.set(false);
+        this.estado.errorPacientes.set(null);
         const prev = this.estado.pacienteSeleccionado();
         if (prev && 'paciente_id' in prev) {
           this.pacienteIdSeleccion = prev.paciente_id;
@@ -71,10 +77,12 @@ export class NuevaRutinaPage implements OnInit {
         this.pacientes = [];
         if (err.status === 401 || err.status === 403) {
           this.estado.requiereInicioSesion.set(true);
-          this.estado.errorMensaje.set(null);
+          this.estado.errorPacientes.set(null);
         } else {
           this.estado.requiereInicioSesion.set(false);
-          this.estado.errorMensaje.set('No se pudo cargar el listado de pacientes.');
+          this.estado.errorPacientes.set(
+            'No se pudo cargar el listado de pacientes. Arranca Docker (docker compose up -d), deja el API accesible en localhost:8002 (ver proxy.conf.json) y ejecuta python manage.py seed_demo en el contenedor del backend.',
+          );
         }
       },
     });
@@ -90,11 +98,13 @@ export class NuevaRutinaPage implements OnInit {
     const p = this.pacientes.find((x) => x.paciente_id === id) ?? null;
     this.estado.pacienteSeleccionado.set(p);
     this.estado.cargandoEjercicios.set(true);
-    this.estado.errorMensaje.set(null);
-    this.ejerciciosApi.getEjerciciosPrefiltradosPorPaciente(id).subscribe({
+    this.estado.errorEjercicios.set(null);
+    void this.auth.asegurarTokenDemo().then(() => {
+      this.ejerciciosApi.getEjerciciosPrefiltradosPorPaciente(id).subscribe({
       next: (ej) => {
         this.estado.ejerciciosPrefiltrados.set(ej);
         this.estado.cargandoEjercicios.set(false);
+        this.estado.errorEjercicios.set(null);
       },
       error: (err: HttpErrorResponse) => {
         this.estado.cargandoEjercicios.set(false);
@@ -111,8 +121,9 @@ export class NuevaRutinaPage implements OnInit {
         } else if (body?.detail) {
           msg = String(body.detail);
         }
-        this.estado.errorMensaje.set(msg);
+        this.estado.errorEjercicios.set(msg);
       },
+    });
     });
   }
 }

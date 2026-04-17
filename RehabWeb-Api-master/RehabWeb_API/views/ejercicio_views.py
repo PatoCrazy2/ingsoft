@@ -21,7 +21,12 @@ from ..serializers import (
     EjercicioCreateUpdateSerializer, 
     ValidacionEjercicioSerializer
 )
-from ..permissions import IsAdminRol
+from ..permissions import (
+    CanEditEjercicioCatalogo,
+    CanPreviewEjercicio,
+    IsAdminRol,
+    IsTerapeutaOrAdmin,
+)
 
 class EjercicioViewSet(viewsets.ModelViewSet):
     """
@@ -38,9 +43,9 @@ class EjercicioViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         # Permisos granulares por acción
         if self.action == 'create':
-            return [IsAdminRol()]
+            return [permissions.IsAuthenticated(), IsTerapeutaOrAdmin()]
         if self.action in ['update', 'partial_update']:
-            return [IsAdminRol()]
+            return [permissions.IsAuthenticated(), CanEditEjercicioCatalogo()]
         if self.action == 'destroy':
             return [IsAdminRol()]
         return [permissions.IsAuthenticated()]
@@ -128,6 +133,20 @@ class EjercicioViewSet(viewsets.ModelViewSet):
                 | Q(estado_publicacion=EstadoPublicacion.PENDIENTE_VALIDACION)
             )
 
+        if user.rol == RolUsuario.TERAPEUTA:
+            return self._filtros_catalogo(
+                qs.filter(
+                    Q(estado_publicacion=EstadoPublicacion.PUBLICADO)
+                    | Q(
+                        creador=user,
+                        estado_publicacion__in=(
+                            EstadoPublicacion.PENDIENTE_VALIDACION,
+                            EstadoPublicacion.BORRADOR,
+                        ),
+                    )
+                )
+            )
+
         return self._filtros_catalogo(
             qs.filter(estado_publicacion=EstadoPublicacion.PUBLICADO)
         )
@@ -210,7 +229,11 @@ class EjercicioViewSet(viewsets.ModelViewSet):
             [{'codigo': c[0], 'nombre': c[1]} for c in CategoriaEjercicio.choices]
         )
 
-    @action(detail=True, methods=['get'], permission_classes=[IsAdminRol])
+    @action(
+        detail=True,
+        methods=['get'],
+        permission_classes=[permissions.IsAuthenticated, CanPreviewEjercicio],
+    )
     def preview(self, request, pk=None):
         """
         GET /ejercicios/{id}/preview/

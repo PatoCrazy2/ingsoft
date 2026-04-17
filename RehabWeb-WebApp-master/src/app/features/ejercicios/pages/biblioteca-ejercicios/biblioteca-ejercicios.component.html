@@ -4,15 +4,18 @@
       <a routerLink="/home" class="bib-nav__link">Inicio</a>
       <span class="bib-nav__sep" aria-hidden="true"></span>
       <span class="bib-nav__current">Biblioteca</span>
-      <a routerLink="/rutinas/nueva" class="bib-nav__link bib-nav__link--cta">Nueva rutina</a>
+      <div class="bib-nav__actions">
+        <a routerLink="/ejercicios/admin/nuevo" class="bib-nav__link bib-nav__link--pill">Proponer ejercicio</a>
+        <a routerLink="/rutinas/nueva" class="bib-nav__link bib-nav__link--cta">Nueva rutina</a>
+      </div>
     </nav>
 
     <header class="bib-hero">
       <p class="bib-hero__kicker">Catálogo clínico</p>
       <h1 class="bib-hero__title">Biblioteca de ejercicios</h1>
       <p class="bib-hero__subtitle">
-        Recursos publicados con criterios de seguridad y evidencia. Inicia sesión como terapeuta para
-        sincronizar con tu API.
+        Recursos publicados con criterios de seguridad y evidencia. La sesión demo del terapeuta se obtiene sola al
+        cargar la app si el API responde.
       </p>
 
       @if (cargaFallida() === 'auth') {
@@ -21,7 +24,7 @@
           <div>
             <strong>Sesión requerida</strong>
             <p>Para ver el catálogo real del servidor, entra con la cuenta demo del terapeuta.</p>
-            <a mat-stroked-button color="primary" routerLink="/login" class="bib-banner__btn">Iniciar sesión</a>
+            <a mat-stroked-button color="primary" routerLink="/home" class="bib-banner__btn">Ir al inicio</a>
           </div>
         </div>
       } @else if (cargaFallida() === 'other') {
@@ -29,7 +32,11 @@
           <mat-icon aria-hidden="true">cloud_off</mat-icon>
           <div>
             <strong>No se pudo conectar al API</strong>
-            <p>Comprueba que el backend esté en marcha y el proxy de desarrollo activo.</p>
+            <p>
+              Arranca el backend con Docker, confirma que el proxy apunte a
+              <code>http://localhost:8002</code> (archivo <code>proxy.conf.json</code>) y usa
+              <code>ng serve</code> (no abras solo el <code>index.html</code>).
+            </p>
           </div>
         </div>
       }

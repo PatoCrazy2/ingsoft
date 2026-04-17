@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { API_BASE_URL, withApiBase } from '../../../core/http/api-base-url';
 
 export interface PacienteListItem {
   paciente_id: string;
@@ -38,7 +39,8 @@ export interface PacienteDetalleDto extends PacienteListItem {
 })
 export class PacienteService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = '/api/pacientes';
+  private readonly apiBase = inject(API_BASE_URL);
+  private readonly baseUrl = withApiBase(this.apiBase, '/api/pacientes');
 
   listar(): Observable<PacienteListItem[]> {
     return this.http.get<PacienteListItem[]>(`${this.baseUrl}/`);

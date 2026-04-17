@@ -32,6 +32,9 @@ import { Ejercicio } from '../../models/ejercicio.model';
 
       <mat-card-content class="ex-card__body">
         <h3 class="ex-card__title">{{ ejercicio.nombre }}</h3>
+        @if (ejercicio.creador_nombre) {
+          <p class="ex-card__author">Por {{ ejercicio.creador_nombre }}</p>
+        }
         <p class="ex-card__desc">{{ ejercicio.descripcion }}</p>
 
         <div class="ex-card__chips" aria-label="Parámetros del ejercicio">
@@ -106,12 +109,19 @@ import { Ejercicio } from '../../models/ejercicio.model';
     }
 
     .ex-card__title {
-      margin: 0 0 0.45rem;
+      margin: 0 0 0.35rem;
       font-size: 1.08rem;
       font-weight: 700;
       letter-spacing: -0.02em;
       color: #0f172a;
       line-height: 1.3;
+    }
+
+    .ex-card__author {
+      margin: 0 0 0.45rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #64748b;
     }
 
     .ex-card__desc {

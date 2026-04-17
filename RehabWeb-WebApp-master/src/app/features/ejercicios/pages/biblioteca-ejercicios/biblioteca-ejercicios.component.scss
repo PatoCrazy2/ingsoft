@@ -29,8 +29,28 @@
   text-decoration: underline;
 }
 
-.bib-nav__link--cta {
+.bib-nav__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.65rem;
   margin-left: auto;
+}
+
+.bib-nav__link--pill {
+  padding: 0.4rem 0.95rem;
+  border-radius: 999px;
+  background: var(--rw-surface);
+  border: 1px solid #e2e8f0;
+  font-weight: 600;
+}
+
+.bib-nav__link--pill:hover {
+  text-decoration: none;
+  background: #f8fafc;
+}
+
+.bib-nav__link--cta {
   padding: 0.4rem 1rem;
   border-radius: 999px;
   background: var(--rw-surface);

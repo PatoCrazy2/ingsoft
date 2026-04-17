@@ -7,7 +7,7 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   template: `
     <main class="landing">
-      <a routerLink="/login" class="login-entry">Login</a>
+      <a routerLink="/home" class="login-entry">Entrar</a>
     </main>
   `,
   styles: [

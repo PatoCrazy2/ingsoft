@@ -33,9 +33,9 @@ class EjercicioTests(APITestCase):
         # URL de la lista de ejercicios
         self.ejercicios_list_url = reverse('ejercicio-list')
 
-    def test_creacion_solo_admin_y_estado_automatico(self):
+    def test_creacion_admin_y_estado_automatico(self):
         """
-        Garantiza que solo el Admin crea y que el estado inicial sea PENDIENTE_VALIDACION.
+        Admin crea ejercicios; estado inicial PENDIENTE_VALIDACION y creador asignado.
         """
         self.client.force_authenticate(user=self.admin)
         data = {
@@ -54,13 +54,32 @@ class EjercicioTests(APITestCase):
         self.assertEqual(ejercicio.estado_publicacion, EstadoPublicacion.PENDIENTE_VALIDACION)
         self.assertEqual(ejercicio.creador, self.admin)
 
-    def test_terapeuta_no_tiene_permiso_de_creacion(self):
-        """
-        Verifica que el rol Terapeuta no puede crear ejercicios directamente.
-        """
-        self.client.force_authenticate(user=self.terapeuta)
-        response = self.client.post(self.ejercicios_list_url, {"nombre": "Intento"})
+    def test_paciente_no_puede_crear(self):
+        self.client.force_authenticate(user=self.paciente)
+        response = self.client.post(
+            self.ejercicios_list_url,
+            {'nombre': 'X', 'descripcion': 'Y', 'series': 1, 'repeticiones': 1},
+        )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_terapeuta_puede_crear_y_queda_pendiente(self):
+        """Terapeuta puede proponer ejercicios; quedan en PENDIENTE_VALIDACION."""
+        self.client.force_authenticate(user=self.terapeuta)
+        data = {
+            'nombre': 'Propuesta terapeuta',
+            'descripcion': 'Descripción técnica del ejercicio propuesto.',
+            'series': 3,
+            'repeticiones': 10,
+            'tiempo_segundos': 30,
+            'url_video': 'https://video-example.com/t',
+            'evidencia_cientifica': 'Revisión sistemática 2020 sobre el tema clínico asociado.',
+            'categoria': 'MOVILIDAD',
+        }
+        response = self.client.post(self.ejercicios_list_url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        ej = Ejercicio.objects.get(id=response.data['id'])
+        self.assertEqual(ej.estado_publicacion, EstadoPublicacion.PENDIENTE_VALIDACION)
+        self.assertEqual(ej.creador, self.terapeuta)
 
     def test_sin_video_exige_evidencia_extensa(self):
         """Sin vídeo: evidencia mínima 40 caracteres; siempre evidencia mín. 20."""
@@ -92,7 +111,8 @@ class EjercicioTests(APITestCase):
 
     def test_visibilidad_segun_rol(self):
         """
-        Los pacientes/terapeutas solo ven ejercicios PUBLICADOS. El admin ve todos.
+        Paciente: solo PUBLICADOS. Terapeuta: PUBLICADOS + sus borradores/pendientes.
+        Admin: ve todo el catálogo.
         """
         Ejercicio.objects.create(
             nombre="Visible", descripcion="Ok", series=3, repeticiones=10,
@@ -104,6 +124,11 @@ class EjercicioTests(APITestCase):
             url_video="http://hidden.com", estado_publicacion=EstadoPublicacion.BORRADOR,
             creador=self.admin
         )
+        Ejercicio.objects.create(
+            nombre="Mi borrador terapeuta", descripcion="Propia", series=2, repeticiones=8,
+            url_video="http://t.com", estado_publicacion=EstadoPublicacion.BORRADOR,
+            creador=self.terapeuta
+        )
 
         # Prueba con Paciente
         self.client.force_authenticate(user=self.paciente)
@@ -111,10 +136,16 @@ class EjercicioTests(APITestCase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['nombre'], "Visible")
 
+        # Terapeuta: público + su borrador (no el borrador del admin)
+        self.client.force_authenticate(user=self.terapeuta)
+        response = self.client.get(self.ejercicios_list_url)
+        nombres = {row['nombre'] for row in response.data}
+        self.assertEqual(nombres, {"Visible", "Mi borrador terapeuta"})
+
         # Prueba con Admin
         self.client.force_authenticate(user=self.admin)
         response = self.client.get(self.ejercicios_list_url)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 3)
 
     def test_flujo_validacion_por_pares_exitoso(self):
         """

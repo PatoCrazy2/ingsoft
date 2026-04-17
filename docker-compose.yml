@@ -15,7 +15,7 @@ services:
 
   backend:
     build: ./RehabWeb-Api-master
-    container_name: rehab_backend
+    container_name: ingsoft-backend
     volumes:
       - ./RehabWeb-Api-master:/app # Hot-reload (cambios en vivo)
     ports:

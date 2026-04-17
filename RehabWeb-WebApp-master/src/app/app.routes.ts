@@ -7,11 +7,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./screens/landing/landing').then((m) => m.LandingComponent),
   },
-  {
-    path: 'login',
-    loadComponent: () =>
-      import('./screens/login/login').then((m) => m.LoginPlaceholderComponent),
-  },
+  { path: 'login', pathMatch: 'full', redirectTo: 'home' },
   {
     path: 'home',
     loadComponent: () =>

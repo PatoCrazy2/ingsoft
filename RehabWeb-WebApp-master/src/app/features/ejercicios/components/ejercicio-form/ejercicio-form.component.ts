@@ -45,9 +45,9 @@ import { Ejercicio, EjercicioFormData } from '../../models/ejercicio.model';
               <mat-form-field appearance="outline" class="w-100 dark-field">
                 <mat-label>Dificultad</mat-label>
                 <mat-select formControlName="dificultad">
-                  <mat-option value="FACIL">🟢 Fácil</mat-option>
-                  <mat-option value="INTERMEDIO">🟡 Intermedio</mat-option>
-                  <mat-option value="DIFICIL">🔴 Difícil</mat-option>
+                  <mat-option value="FACIL">Fácil</mat-option>
+                  <mat-option value="INTERMEDIO">Intermedio</mat-option>
+                  <mat-option value="DIFICIL">Difícil</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>

@@ -24,7 +24,7 @@
           El listado de pacientes está protegido. Inicia sesión con la cuenta demo del terapeuta (tras
           <code>seed_demo</code> en el API).
         </p>
-        <a mat-flat-button color="primary" routerLink="/login" class="nr-auth__btn">Ir a iniciar sesión</a>
+        <a mat-flat-button color="primary" routerLink="/home" class="nr-auth__btn">Ir al inicio</a>
         <p class="nr-auth__hint">
           <strong>Demo:</strong> terapeuta&#64;demo.rehab · demo12345
         </p>
@@ -42,13 +42,21 @@
             <mat-spinner diameter="40"></mat-spinner>
             <span>Cargando pacientes…</span>
           </div>
+        } @else if (estado.errorPacientes()) {
+          <div class="nr-panel__fail" role="alert">
+            <mat-icon aria-hidden="true">cloud_off</mat-icon>
+            <p>{{ estado.errorPacientes() }}</p>
+            <button mat-stroked-button type="button" color="primary" (click)="cargarPacientes()">
+              Reintentar
+            </button>
+          </div>
         } @else if (pacientes.length === 0) {
           <div class="nr-panel__empty">
             <mat-icon>group_off</mat-icon>
             <p>No hay pacientes asignados a tu cuenta.</p>
             <p class="nr-panel__empty-note">
-              Ejecuta en el backend <code>python manage.py seed_demo</code> o asocia pacientes al terapeuta
-              autenticado.
+              Debes iniciar sesión como <strong>terapeuta&#64;demo.rehab</strong> (no como paciente) y ejecutar en el
+              backend <code>python manage.py seed_demo</code>.
             </p>
           </div>
         } @else {
@@ -71,12 +79,12 @@
       </section>
     }
 
-    @if (estado.errorMensaje()) {
+    @if (estado.errorEjercicios()) {
       <div class="nr-alert" role="alert">
         <mat-icon class="nr-alert__icon">error_outline</mat-icon>
         <div class="nr-alert__text">
-          <strong>No se pudo completar la acción</strong>
-          <p>{{ estado.errorMensaje() }}</p>
+          <strong>Ejercicios para el paciente</strong>
+          <p>{{ estado.errorEjercicios() }}</p>
         </div>
       </div>
     }

@@ -1,11 +1,15 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../../core/auth/auth.service';
 import { EjercicioService } from '../../services/ejercicio.service';
 import { Ejercicio } from '../../models/ejercicio.model';
 
@@ -234,12 +238,32 @@ import { Ejercicio } from '../../models/ejercicio.model';
   `]
 })
 export class AdminEjerciciosPage implements OnInit {
-  private ejercicioService = inject(EjercicioService);
-  
+  private readonly ejercicioService = inject(EjercicioService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+
   ejercicios = this.ejercicioService.ejercicios;
   displayedColumns: string[] = ['nombre', 'estado', 'dificultad', 'acciones'];
 
   ngOnInit(): void {
-    this.ejercicioService.getEjercicios().subscribe();
+    this.recargar();
+    this.router.events
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => {
+        const path = this.router.url.split('?')[0];
+        if (path === '/ejercicios/admin') {
+          this.recargar();
+        }
+      });
+  }
+
+  private recargar(): void {
+    void this.auth.asegurarTokenDemo().then(() => {
+      this.ejercicioService.getEjercicios().subscribe();
+    });
   }
 }

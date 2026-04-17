@@ -34,10 +34,11 @@ export class BibliotecaEjerciciosPage implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
 
-  ejercicios = this.ejercicioService.ejercicios;
   loading = this.ejercicioService.loading;
 
   searchQuery = '';
+  /** Respuesta del API (solo publicados); la búsqueda filtra sobre esto, no sobre la señal global del servicio. */
+  private readonly listaBiblioteca = signal<Ejercicio[]>([]);
   filteredEjercicios = signal<Ejercicio[]>([]);
   cargaFallida = signal<FalloCarga>('none');
 
@@ -48,27 +49,39 @@ export class BibliotecaEjerciciosPage implements OnInit {
   }
 
   ngOnInit(): void {
-    this.cargar();
+    void this.auth.asegurarTokenDemo().then(() => this.cargar());
   }
 
   private cargar(): void {
-    this.ejercicioService.getEjercicios({ estado: 'PUBLICADO' }).subscribe({
-      next: (data: Ejercicio[]) => {
-        this.cargaFallida.set('none');
-        this.filteredEjercicios.set(data);
-        this.onSearch();
-      },
-      error: (err: HttpErrorResponse) => {
-        this.filteredEjercicios.set([]);
-        this.cargaFallida.set(err.status === 401 || err.status === 403 ? 'auth' : 'other');
-      },
+    void this.auth.asegurarTokenDemo().then(() => {
+      this.ejercicioService.getEjercicios({ estado: 'PUBLICADO' }).subscribe({
+        next: (data: Ejercicio[]) => {
+          this.cargaFallida.set('none');
+          this.listaBiblioteca.set(data);
+          this.aplicarFiltroBusqueda();
+        },
+        error: (err: HttpErrorResponse) => {
+          this.listaBiblioteca.set([]);
+          this.filteredEjercicios.set([]);
+          this.cargaFallida.set(err.status === 401 || err.status === 403 ? 'auth' : 'other');
+        },
+      });
     });
   }
 
   onSearch(): void {
-    const query = this.searchQuery.toLowerCase();
+    this.aplicarFiltroBusqueda();
+  }
+
+  private aplicarFiltroBusqueda(): void {
+    const query = this.searchQuery.toLowerCase().trim();
+    const base = this.listaBiblioteca();
+    if (!query) {
+      this.filteredEjercicios.set(base);
+      return;
+    }
     this.filteredEjercicios.set(
-      this.ejercicios().filter(
+      base.filter(
         (e) =>
           e.nombre.toLowerCase().includes(query) ||
           (e.categoria ?? '').toLowerCase().includes(query) ||
@@ -79,6 +92,6 @@ export class BibliotecaEjerciciosPage implements OnInit {
 
   limpiarBusqueda(): void {
     this.searchQuery = '';
-    this.filteredEjercicios.set(this.ejercicios());
+    this.aplicarFiltroBusqueda();
   }
 }

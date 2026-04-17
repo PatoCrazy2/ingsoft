@@ -14,14 +14,18 @@ export class NuevaRutinaStateService {
   readonly ejerciciosPrefiltrados = signal<Ejercicio[]>([]);
   readonly cargandoPacientes = signal(false);
   readonly cargandoEjercicios = signal(false);
-  readonly errorMensaje = signal<string | null>(null);
+  /** Fallo al cargar `/api/pacientes/` (red, credenciales, etc.). */
+  readonly errorPacientes = signal<string | null>(null);
+  /** Fallo al cargar ejercicios prefiltrados para el paciente elegido. */
+  readonly errorEjercicios = signal<string | null>(null);
   /** 401 u otro fallo de autenticación al cargar pacientes. */
   readonly requiereInicioSesion = signal(false);
 
   limpiar(): void {
     this.pacienteSeleccionado.set(null);
     this.ejerciciosPrefiltrados.set([]);
-    this.errorMensaje.set(null);
+    this.errorPacientes.set(null);
+    this.errorEjercicios.set(null);
     this.requiereInicioSesion.set(false);
   }
 }

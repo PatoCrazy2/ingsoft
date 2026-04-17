@@ -8,6 +8,8 @@ export interface Ejercicio {
   instrucciones?: string;
   material_necesario?: string;
   video_url?: string;
+  /** Alias del campo `url_video` del API (mismo valor que `video_url`). */
+  url_video?: string;
   imagen_url?: string;
   categoria?: string;
   dificultad?: 'FACIL' | 'INTERMEDIO' | 'DIFICIL';
@@ -16,6 +18,8 @@ export interface Ejercicio {
   evidencia_cientifica?: string;
   es_personalizado?: boolean;
   autor_id?: string;
+  /** Nombre del usuario creador (API Django `creador_nombre`). */
+  creador_nombre?: string;
   puntuacion_media?: number;
   total_valoraciones?: number;
   series?: number;
