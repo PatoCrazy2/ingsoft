@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 # --- Enums / Choices ---
@@ -8,6 +9,11 @@ class RolUsuario(models.TextChoices):
     PACIENTE = 'Paciente', 'Paciente'
     TERAPEUTA = 'Terapeuta', 'Terapeuta'
     ADMIN = 'Admin', 'Admin'
+
+class EstadoPublicacion(models.TextChoices):
+    BORRADOR = 'BORRADOR', 'Borrador'
+    PENDIENTE_VALIDACION = 'PENDIENTE_VALIDACION', 'Pendiente de Validación'
+    PUBLICADO = 'PUBLICADO', 'Publicado'
 
 class EstadoPaciente(models.TextChoices):
     ACTIVO = 'Activo', 'Activo'
@@ -129,9 +135,59 @@ class Ejercicio(models.Model):
     repeticiones = models.IntegerField()
     tiempo_segundos = models.IntegerField(null=True, blank=True)
     url_video = models.URLField(null=True, blank=True)
+    
+    # Nuevos campos de extensión
+    evidencia_cientifica = models.TextField(null=True, blank=True, help_text="Soporta Markdown o HTML enriquecido")
+    referencias_bibliograficas = models.JSONField(
+        default=list, 
+        blank=True, 
+        null=True, 
+        help_text="Lista de {tipo: 'link'|'pdf', url: string, titulo: string}"
+    )
+    estado_publicacion = models.CharField(
+        max_length=25, 
+        choices=EstadoPublicacion.choices, 
+        default=EstadoPublicacion.BORRADOR
+    )
+    creador = models.ForeignKey(
+        Usuario, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        related_name='ejercicios_creados'
+    )
+    video_archivo = models.FileField(upload_to='ejercicios/videos/', null=True, blank=True)
+    thumbnail_url = models.URLField(null=True, blank=True)
 
     def __str__(self):
         return self.nombre
+
+class ValidacionEjercicio(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    ejercicio = models.ForeignKey(Ejercicio, on_delete=models.CASCADE, related_name='validaciones')
+    validador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='validaciones_realizadas')
+    es_valido = models.BooleanField()
+    comentario = models.TextField(null=True, blank=True)
+    fecha_validacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('ejercicio', 'validador')
+        verbose_name = 'Validación de Ejercicio'
+        verbose_name_plural = 'Validaciones de Ejercicios'
+
+    def clean(self):
+        # Validación: Comentario obligatorio si es_valido es False
+        if self.es_valido is False and not self.comentario:
+            raise ValidationError({
+                'comentario': 'El comentario es obligatorio cuando el ejercicio no es válido.'
+            })
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        estado = "Válido" if self.es_valido else "No Válido"
+        return f"Validación: {self.ejercicio.nombre} - {estado} por {self.validador.nombre_completo}"
 
 class RutinaEjercicio(models.Model):
     rutina = models.ForeignKey(Rutina, on_delete=models.CASCADE, related_name='ejercicios_asociados')
