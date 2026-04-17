@@ -34,6 +34,14 @@ class NivelMovilidad(models.TextChoices):
     NIVEL_2 = '2', 'Nivel 2 - Limitado'
     NIVEL_3 = '3', 'Nivel 3 - Moderado'
     NIVEL_4 = '4', 'Nivel 4 - Autónomo'
+    NIVEL_5 = '5', 'Nivel 5 - Función óptima'
+
+
+class TerritorioACV(models.TextChoices):
+    CUALQUIERA = 'CUALQUIERA', 'Cualquiera / no específico'
+    HEMISFERIO_DERECHO = 'HEMISFERIO_DERECHO', 'Hemisferio derecho'
+    HEMISFERIO_IZQUIERDO = 'HEMISFERIO_IZQUIERDO', 'Hemisferio izquierdo'
+    BILATERAL = 'BILATERAL', 'Bilateral'
 
 # --- Manager para Usuario ---
 
@@ -97,6 +105,13 @@ class PerfilClinico(models.Model):
     historial_medico = models.TextField()
     nivel_movilidad = models.CharField(max_length=20, choices=NivelMovilidad.choices)
     restricciones = models.TextField()
+    territorio_acv = models.CharField(
+        max_length=30,
+        choices=TerritorioACV.choices,
+        null=True,
+        blank=True,
+        help_text='Territorio afectado por ACV para filtrado de ejercicios',
+    )
 
     def __str__(self):
         return f"Perfil: {self.diagnostico_principal}"
@@ -126,6 +141,16 @@ class Rutina(models.Model):
 
     def __str__(self):
         return self.nombre
+
+
+class CategoriaEjercicio(models.TextChoices):
+    GENERAL = 'GENERAL', 'General'
+    FUERZA = 'FUERZA', 'Fuerza'
+    MOVILIDAD = 'MOVILIDAD', 'Movilidad'
+    EQUILIBRIO = 'EQUILIBRIO', 'Equilibrio'
+    POSTURAL = 'POSTURAL', 'Higiene postural'
+    CARDIO = 'CARDIO', 'Cardiorrespiratorio'
+
 
 class Ejercicio(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -157,6 +182,34 @@ class Ejercicio(models.Model):
     )
     video_archivo = models.FileField(upload_to='ejercicios/videos/', null=True, blank=True)
     thumbnail_url = models.URLField(null=True, blank=True)
+
+    movilidad_paciente_min = models.CharField(
+        max_length=2,
+        choices=NivelMovilidad.choices,
+        default=NivelMovilidad.NIVEL_1,
+        help_text='Nivel mínimo de movilidad del paciente (1–5) para el que el ejercicio es adecuado',
+    )
+    movilidad_paciente_max = models.CharField(
+        max_length=2,
+        choices=NivelMovilidad.choices,
+        default=NivelMovilidad.NIVEL_5,
+        help_text='Nivel máximo de movilidad del paciente (1–5) para el que el ejercicio es adecuado',
+    )
+    territorios_acv_compatibles = models.JSONField(
+        default=list,
+        blank=True,
+        help_text='Lista de códigos TerritorioACV; vacío = compatible con cualquier territorio',
+    )
+    categoria = models.CharField(
+        max_length=20,
+        choices=CategoriaEjercicio.choices,
+        default=CategoriaEjercicio.GENERAL,
+    )
+    etiquetas_clinicas = models.JSONField(
+        default=list,
+        blank=True,
+        help_text='Etiquetas del tesauro clínico asociadas al ejercicio',
+    )
 
     def __str__(self):
         return self.nombre
@@ -226,6 +279,10 @@ class EvaluacionClinica(models.Model):
     fecha_evaluacion = models.DateTimeField()
     notas_evaluacion = models.TextField()
     metricas_objetivas = models.JSONField() # Soporta JSON nativo en MySQL 8.0/Postgres
+    es_evaluacion_inicial = models.BooleanField(
+        default=False,
+        help_text='Si es True, se prioriza junto con el perfil para pre-filtrado (RF-CLIN-002)',
+    )
 
 class Auditoria(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

@@ -1,0 +1,110 @@
+<div class="nr-page">
+  <div class="nr-shell">
+    <nav class="nr-nav" aria-label="Secciones">
+      <a routerLink="/home" class="nr-nav__link">Inicio</a>
+      <span class="nr-nav__sep" aria-hidden="true"></span>
+      <span class="nr-nav__current">Nueva rutina</span>
+      <a routerLink="/ejercicios" class="nr-nav__link nr-nav__link--push">Biblioteca</a>
+    </nav>
+
+    <header class="nr-hero">
+      <p class="nr-hero__kicker">Flujo clínico</p>
+      <h1 class="nr-hero__title">Nueva rutina</h1>
+      <p class="nr-hero__subtitle">
+        Elige un paciente de tu cartera: el catálogo se reduce en el servidor según movilidad, territorio
+        ACV y evaluación registrada.
+      </p>
+    </header>
+
+    @if (estado.requiereInicioSesion()) {
+      <section class="nr-auth" aria-labelledby="nr-auth-title">
+        <mat-icon class="nr-auth__icon" aria-hidden="true">lock_person</mat-icon>
+        <h2 id="nr-auth-title" class="nr-auth__title">Acceso de terapeuta</h2>
+        <p class="nr-auth__text">
+          El listado de pacientes está protegido. Inicia sesión con la cuenta demo del terapeuta (tras
+          <code>seed_demo</code> en el API).
+        </p>
+        <a mat-flat-button color="primary" routerLink="/login" class="nr-auth__btn">Ir a iniciar sesión</a>
+        <p class="nr-auth__hint">
+          <strong>Demo:</strong> terapeuta&#64;demo.rehab · demo12345
+        </p>
+      </section>
+    } @else {
+      <section class="nr-panel" aria-labelledby="nr-paciente-label">
+        <div class="nr-panel__head">
+          <h2 id="nr-paciente-label" class="nr-panel__title">Paciente</h2>
+          <span class="nr-panel__chip">Pre-filtrado en servidor</span>
+        </div>
+        <p class="nr-panel__hint">Los criterios clínicos se aplican al elegir un paciente de tu lista.</p>
+
+        @if (estado.cargandoPacientes()) {
+          <div class="nr-panel__state">
+            <mat-spinner diameter="40"></mat-spinner>
+            <span>Cargando pacientes…</span>
+          </div>
+        } @else if (pacientes.length === 0) {
+          <div class="nr-panel__empty">
+            <mat-icon>group_off</mat-icon>
+            <p>No hay pacientes asignados a tu cuenta.</p>
+            <p class="nr-panel__empty-note">
+              Ejecuta en el backend <code>python manage.py seed_demo</code> o asocia pacientes al terapeuta
+              autenticado.
+            </p>
+          </div>
+        } @else {
+          <mat-form-field appearance="outline" class="nr-field" subscriptSizing="dynamic">
+            <mat-label>Seleccionar paciente</mat-label>
+            <mat-icon matPrefix class="nr-field__icon">person</mat-icon>
+            <mat-select
+              [(ngModel)]="pacienteIdSeleccion"
+              (ngModelChange)="alCambiarPaciente($event)"
+              placeholder="Elige un paciente"
+            >
+              @for (p of pacientes; track p.paciente_id) {
+                <mat-option [value]="p.paciente_id">
+                  {{ p.nombre_completo }} — {{ p.email }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+      </section>
+    }
+
+    @if (estado.errorMensaje()) {
+      <div class="nr-alert" role="alert">
+        <mat-icon class="nr-alert__icon">error_outline</mat-icon>
+        <div class="nr-alert__text">
+          <strong>No se pudo completar la acción</strong>
+          <p>{{ estado.errorMensaje() }}</p>
+        </div>
+      </div>
+    }
+
+    @if (estado.cargandoEjercicios()) {
+      <div class="nr-inline-loading">
+        <mat-spinner diameter="36"></mat-spinner>
+        <span>Aplicando criterios clínicos al catálogo…</span>
+      </div>
+    }
+
+    @if (!estado.cargandoEjercicios() && pacienteIdSeleccion && auth.isLoggedIn()) {
+      <section class="nr-results" aria-labelledby="nr-results-title">
+        <div class="nr-results__head">
+          <h2 id="nr-results-title" class="nr-results__title">Ejercicios sugeridos</h2>
+          <p class="nr-results__caption">Filtrado según movilidad, territorio ACV y evaluación registrada.</p>
+        </div>
+        <div class="nr-grid">
+          @for (e of estado.ejerciciosPrefiltrados(); track e.id) {
+            <app-ejercicio-card [ejercicio]="e" class="nr-grid__item"></app-ejercicio-card>
+          } @empty {
+            <div class="nr-results__empty">
+              <mat-icon>filter_alt_off</mat-icon>
+              <p>No hay ejercicios publicados que cumplan los criterios de este paciente.</p>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </div>
+</div>

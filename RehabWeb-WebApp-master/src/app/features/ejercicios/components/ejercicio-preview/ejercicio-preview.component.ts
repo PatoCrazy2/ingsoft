@@ -37,7 +37,7 @@ import { Ejercicio } from '../../models/ejercicio.model';
           <div>
             <div class="d-flex align-items-center gap-2 mb-2">
               <span class="badge-premium">{{ ejercicio.categoria }}</span>
-              <span class="difficulty-indicator" [ngClass]="ejercicio.dificultad.toLowerCase()"></span>
+              <span class="difficulty-indicator" [ngClass]="(ejercicio.dificultad ?? 'FACIL').toLowerCase()"></span>
               <span class="small text-secondary fw-bold">{{ ejercicio.dificultad }}</span>
             </div>
             <h1 class="display-5 fw-bold text-dark mb-0">{{ ejercicio.nombre }}</h1>

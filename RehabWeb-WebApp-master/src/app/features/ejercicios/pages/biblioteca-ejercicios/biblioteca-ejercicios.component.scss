@@ -1,0 +1,271 @@
+.bib-page {
+  min-height: 100dvh;
+  background: linear-gradient(185deg, #eef2ff 0%, var(--bg-color) 22%, var(--bg-color) 100%);
+  padding: 1.25rem 1rem 3.5rem;
+}
+
+.bib-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.bib-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-bottom: 2rem;
+  font-size: 0.875rem;
+}
+
+.bib-nav__link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.bib-nav__link:hover {
+  text-decoration: underline;
+}
+
+.bib-nav__link--cta {
+  margin-left: auto;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  background: var(--rw-surface);
+  border: 1px solid #93c5fd;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05);
+}
+
+.bib-nav__link--cta:hover {
+  text-decoration: none;
+  background: #dbeafe;
+}
+
+.bib-nav__sep {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #cbd5e1;
+}
+
+.bib-nav__current {
+  color: var(--rw-muted);
+  font-weight: 500;
+}
+
+.bib-hero {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.bib-hero__kicker {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6366f1;
+}
+
+.bib-hero__title {
+  margin: 0 0 0.65rem;
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: var(--rw-title);
+}
+
+.bib-hero__subtitle {
+  margin: 0 auto;
+  max-width: 38rem;
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: var(--rw-muted);
+  font-weight: 400;
+}
+
+.bib-banner {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  text-align: left;
+  max-width: 520px;
+  margin: 1.5rem auto 0;
+  padding: 1rem 1.15rem;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.bib-banner mat-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.bib-banner strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--rw-title);
+}
+
+.bib-banner p {
+  margin: 0 0 0.75rem;
+  color: var(--rw-muted);
+}
+
+.bib-banner--auth {
+  background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 100%);
+  border: 1px solid #bfdbfe;
+}
+
+.bib-banner--auth mat-icon {
+  color: #2563eb;
+}
+
+.bib-banner--warn {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+.bib-banner--warn mat-icon {
+  color: #b45309;
+}
+
+.bib-banner__btn {
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+}
+
+.bib-search-wrap {
+  max-width: 560px;
+  margin: 1.75rem auto 0;
+  text-align: left;
+}
+
+.bib-search__label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--rw-title);
+  margin-bottom: 0.5rem;
+}
+
+.bib-search__box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  background: var(--rw-surface);
+  border: 1px solid var(--rw-border);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgb(15 23 42 / 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bib-search__box:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgb(29 78 216 / 0.14);
+}
+
+.bib-search__glyph {
+  color: #94a3b8;
+  font-size: 1.35rem;
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.bib-search__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--rw-title);
+  outline: none;
+}
+
+.bib-search__input::placeholder {
+  color: #94a3b8;
+}
+
+.bib-main {
+  margin-top: 0.5rem;
+}
+
+.bib-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .bib-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .bib-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.bib-grid__item {
+  display: block;
+  height: 100%;
+  min-width: 0;
+}
+
+.bib-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 1.5rem;
+  border-radius: 20px;
+  background: var(--rw-surface);
+  border: 1px dashed var(--rw-border);
+  color: var(--rw-muted);
+  grid-column: 1 / -1;
+}
+
+.bib-state--loading {
+  border-style: solid;
+  box-shadow: var(--card-shadow);
+}
+
+.bib-state--loading p {
+  margin: 1rem 0 0;
+  font-size: 0.95rem;
+}
+
+.bib-state--empty mat-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.35;
+}
+
+.bib-state--empty p {
+  margin: 0 0 1rem;
+  max-width: 22rem;
+  line-height: 1.5;
+}
+
+.bib-link-btn {
+  border: none;
+  background: none;
+  color: var(--primary-color);
+  font-weight: 600;
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+}

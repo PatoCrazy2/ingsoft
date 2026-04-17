@@ -1,20 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary-color: #4f46e5;
-  --primary-hover: #4338ca;
+  --primary-color: #1d4ed8;
+  --primary-hover: #1e40af;
   --secondary-color: #64748b;
-  --bg-color: #f8fafc;
-  --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --premium-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --bg-color: #f1f5f9;
+  --rw-surface: #ffffff;
+  --rw-title: #0f172a;
+  --rw-border: #e2e8f0;
+  --rw-border-strong: #1e293b;
+  --rw-muted: #64748b;
+  --rw-accent-soft: #eff6ff;
+  --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --premium-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.06);
 }
 
-html, body { 
-  height: 100%; 
-  margin: 0; 
+html, body {
+  height: 100%;
+  margin: 0;
   font-family: 'Outfit', sans-serif;
   background-color: var(--bg-color);
-  color: #1e293b;
+  color: var(--rw-title);
+  -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, h5 {

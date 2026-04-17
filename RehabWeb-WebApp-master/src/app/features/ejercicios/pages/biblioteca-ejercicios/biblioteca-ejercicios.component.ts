@@ -1,158 +1,84 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { EjercicioService } from '../../services/ejercicio.service';
-import { EjercicioCardComponent } from '../../components/ejercicio-card/ejercicio-card.component';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { FormsModule } from '@angular/forms';
+import { EjercicioService } from '../../services/ejercicio.service';
+import { EjercicioCardComponent } from '../../components/ejercicio-card/ejercicio-card.component';
+import { Ejercicio } from '../../models/ejercicio.model';
+import { AuthService } from '../../../../core/auth/auth.service';
+
+type FalloCarga = 'none' | 'auth' | 'other';
 
 @Component({
   selector: 'app-biblioteca-ejercicios',
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     EjercicioCardComponent,
-    MatFormFieldModule,
-    MatInputModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    FormsModule
+    FormsModule,
+    MatButtonModule,
   ],
-  template: `
-    <div class="biblioteca-container">
-      <header class="biblioteca-header">
-        <div class="header-content">
-          <h1 class="mat-display-1 fw-bold">Biblioteca de Ejercicios</h1>
-          <p class="mat-body-large text-secondary">
-            Explora recursos terapéuticos validados y gestiona tus rutinas.
-          </p>
-
-          <div class="search-container mt-4">
-            <mat-form-field appearance="outline" class="w-100 search-field">
-              <mat-label>Buscar ejercicios o categorías</mat-label>
-              <input matInput [(ngModel)]="searchQuery" (input)="onSearch()" placeholder="Ej: Rodilla, Fuerza...">
-              <mat-icon matSuffix color="primary">search</mat-icon>
-            </mat-form-field>
-          </div>
-        </div>
-      </header>
-
-      <main class="biblioteca-main">
-        @if (loading()) {
-          <div class="loading-state">
-            <mat-spinner diameter="60"></mat-spinner>
-            <p>Cargando biblioteca...</p>
-          </div>
-        } @else {
-          <div class="ejercicios-grid">
-            @for (e of filteredEjercicios(); track e.id) {
-              <app-ejercicio-card [ejercicio]="e" class="grid-item"></app-ejercicio-card>
-            } @empty {
-              <div class="empty-state">
-                <mat-icon>inventory_2</mat-icon>
-                <p>No se encontraron resultados para tu búsqueda.</p>
-              </div>
-            }
-          </div>
-        }
-      </main>
-    </div>
-  `,
-  styles: [`
-    .biblioteca-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 1rem;
-      min-height: 100vh;
-    }
-
-    .biblioteca-header {
-      margin-bottom: 3rem;
-      text-align: center;
-    }
-      
-    .header-content {
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    .biblioteca-header h1 {
-      color: #1a1a1a;
-      letter-spacing: -0.5px;
-      margin-bottom: 0.5rem;
-    }
-
-    .search-field ::ng-deep .mat-mdc-text-field-wrapper {
-      background-color: white !important;
-      border-radius: 12px !important;
-    }
-
-    /* Grid Responsivo (CSS Estándar) */
-    .ejercicios-grid {
-      display: grid;
-      gap: 24px;
-      grid-template-columns: 1fr;
-    }
-    
-    @media (min-width: 768px) {
-      .ejercicios-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    
-    @media (min-width: 1024px) {
-      .ejercicios-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    .grid-item {
-      display: block;
-      height: 100%;
-    }
-
-    .loading-state, .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 5rem 0;
-      color: #9e9e9e;
-    }
-
-    .loading-state mat-icon, .empty-state mat-icon {
-      font-size: 64px;
-      width: 64px;
-      height: 64px;
-      margin-bottom: 1rem;
-    }
-  `]
+  templateUrl: './biblioteca-ejercicios.component.html',
+  styleUrl: './biblioteca-ejercicios.component.scss',
 })
 export class BibliotecaEjerciciosPage implements OnInit {
-  private ejercicioService = inject(EjercicioService);
-  
+  private readonly ejercicioService = inject(EjercicioService);
+  private readonly auth = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
+
   ejercicios = this.ejercicioService.ejercicios;
   loading = this.ejercicioService.loading;
-  
+
   searchQuery = '';
-  filteredEjercicios = signal(this.ejercicios());
+  filteredEjercicios = signal<Ejercicio[]>([]);
+  cargaFallida = signal<FalloCarga>('none');
+
+  constructor() {
+    this.auth.sesionLista$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.cargar());
+  }
 
   ngOnInit(): void {
+    this.cargar();
+  }
+
+  private cargar(): void {
     this.ejercicioService.getEjercicios({ estado: 'PUBLICADO' }).subscribe({
-      next: (data) => this.filteredEjercicios.set(data),
-      error: (err) => console.error('Error loading exercises', err)
+      next: (data: Ejercicio[]) => {
+        this.cargaFallida.set('none');
+        this.filteredEjercicios.set(data);
+        this.onSearch();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.filteredEjercicios.set([]);
+        this.cargaFallida.set(err.status === 401 || err.status === 403 ? 'auth' : 'other');
+      },
     });
   }
 
   onSearch(): void {
     const query = this.searchQuery.toLowerCase();
     this.filteredEjercicios.set(
-      this.ejercicios().filter(e => 
-        e.nombre.toLowerCase().includes(query) || 
-        e.categoria.toLowerCase().includes(query)
-      )
+      this.ejercicios().filter(
+        (e) =>
+          e.nombre.toLowerCase().includes(query) ||
+          (e.categoria ?? '').toLowerCase().includes(query) ||
+          e.descripcion.toLowerCase().includes(query),
+      ),
     );
+  }
+
+  limpiarBusqueda(): void {
+    this.searchQuery = '';
+    this.filteredEjercicios.set(this.ejercicios());
   }
 }

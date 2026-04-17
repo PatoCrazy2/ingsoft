@@ -28,3 +28,13 @@ class IsTerapeutaRol(permissions.BasePermission):
             request.user.is_authenticated and 
             request.user.rol == RolUsuario.TERAPEUTA
         )
+
+
+class IsTerapeutaOrAdmin(permissions.BasePermission):
+    """Terapeuta o Administrador."""
+    def has_permission(self, request, view):
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and request.user.rol in (RolUsuario.TERAPEUTA, RolUsuario.ADMIN)
+        )

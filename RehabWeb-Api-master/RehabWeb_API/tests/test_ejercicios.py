@@ -44,7 +44,8 @@ class EjercicioTests(APITestCase):
             "series": 3,
             "repeticiones": 1,
             "tiempo_segundos": 30,
-            "url_video": "https://video-example.com/stretch"
+            "url_video": "https://video-example.com/stretch",
+            "evidencia_cientifica": "Revisión sistemática 2020 sobre estiramientos isquiotibiales.",
         }
         response = self.client.post(self.ejercicios_list_url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -61,19 +62,33 @@ class EjercicioTests(APITestCase):
         response = self.client.post(self.ejercicios_list_url, {"nombre": "Intento"})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_requiere_video_o_archivo(self):
-        """
-        Verifica la validación personalizada del serializer: debe haber URL o Archivo.
-        """
+    def test_sin_video_exige_evidencia_extensa(self):
+        """Sin vídeo: evidencia mínima 40 caracteres; siempre evidencia mín. 20."""
         self.client.force_authenticate(user=self.admin)
         data = {
-            "nombre": "Sin Video",
-            "descripcion": "Error esperado",
-            "series": 3, "repeticiones": 10
+            "nombre": "Solo texto",
+            "descripcion": "Desc técnica",
+            "series": 3,
+            "repeticiones": 10,
+            "evidencia_cientifica": "x" * 25,
         }
         response = self.client.post(self.ejercicios_list_url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Debe proporcionar al menos un medio de video", str(response.data))
+        self.assertIn("40 caracteres", str(response.data))
+
+    def test_sin_video_ok_con_evidencia_larga(self):
+        self.client.force_authenticate(user=self.admin)
+        largo = "Evidencia suficiente sin URL de vídeo. " * 2
+        data = {
+            "nombre": "Solo evidencia",
+            "descripcion": "Desc",
+            "series": 2,
+            "repeticiones": 8,
+            "evidencia_cientifica": largo,
+            "categoria": "MOVILIDAD",
+        }
+        response = self.client.post(self.ejercicios_list_url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_visibilidad_segun_rol(self):
         """

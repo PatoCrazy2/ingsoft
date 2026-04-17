@@ -1,0 +1,78 @@
+<div class="bib-page">
+  <div class="bib-shell">
+    <nav class="bib-nav" aria-label="Secciones">
+      <a routerLink="/home" class="bib-nav__link">Inicio</a>
+      <span class="bib-nav__sep" aria-hidden="true"></span>
+      <span class="bib-nav__current">Biblioteca</span>
+      <a routerLink="/rutinas/nueva" class="bib-nav__link bib-nav__link--cta">Nueva rutina</a>
+    </nav>
+
+    <header class="bib-hero">
+      <p class="bib-hero__kicker">Catálogo clínico</p>
+      <h1 class="bib-hero__title">Biblioteca de ejercicios</h1>
+      <p class="bib-hero__subtitle">
+        Recursos publicados con criterios de seguridad y evidencia. Inicia sesión como terapeuta para
+        sincronizar con tu API.
+      </p>
+
+      @if (cargaFallida() === 'auth') {
+        <div class="bib-banner bib-banner--auth" role="status">
+          <mat-icon aria-hidden="true">vpn_key</mat-icon>
+          <div>
+            <strong>Sesión requerida</strong>
+            <p>Para ver el catálogo real del servidor, entra con la cuenta demo del terapeuta.</p>
+            <a mat-stroked-button color="primary" routerLink="/login" class="bib-banner__btn">Iniciar sesión</a>
+          </div>
+        </div>
+      } @else if (cargaFallida() === 'other') {
+        <div class="bib-banner bib-banner--warn" role="alert">
+          <mat-icon aria-hidden="true">cloud_off</mat-icon>
+          <div>
+            <strong>No se pudo conectar al API</strong>
+            <p>Comprueba que el backend esté en marcha y el proxy de desarrollo activo.</p>
+          </div>
+        </div>
+      }
+
+      <div class="bib-search-wrap">
+        <label class="bib-search__label" for="bibSearchInput">Buscar ejercicios o categorías</label>
+        <div class="bib-search__box">
+          <mat-icon class="bib-search__glyph" aria-hidden="true">search</mat-icon>
+          <input
+            id="bibSearchInput"
+            class="bib-search__input"
+            type="search"
+            [(ngModel)]="searchQuery"
+            (input)="onSearch()"
+            placeholder="Rodilla, movilidad, fuerza…"
+            autocomplete="off"
+            enterkeyhint="search"
+          />
+        </div>
+      </div>
+    </header>
+
+    <main class="bib-main">
+      @if (loading()) {
+        <div class="bib-state bib-state--loading">
+          <mat-spinner diameter="48"></mat-spinner>
+          <p>Cargando biblioteca…</p>
+        </div>
+      } @else {
+        <div class="bib-grid">
+          @for (e of filteredEjercicios(); track e.id) {
+            <app-ejercicio-card [ejercicio]="e" class="bib-grid__item"></app-ejercicio-card>
+          } @empty {
+            <div class="bib-state bib-state--empty">
+              <mat-icon>inventory_2</mat-icon>
+              <p>No hay ejercicios que mostrar con los filtros actuales.</p>
+              @if (searchQuery) {
+                <button type="button" class="bib-link-btn" (click)="limpiarBusqueda()">Limpiar búsqueda</button>
+              }
+            </div>
+          }
+        </div>
+      }
+    </main>
+  </div>
+</div>

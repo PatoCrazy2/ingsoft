@@ -22,5 +22,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copia el código
 COPY . .
 
-# Comando para ejecutar el servidor (puerto 8000)
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

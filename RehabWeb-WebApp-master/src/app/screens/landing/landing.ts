@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
+  imports: [RouterLink],
   template: `
     <main class="landing">
-      <h1>RehabWeb</h1>
-      <p>Frontend y backend en funcionamiento.</p>
+      <a routerLink="/login" class="login-entry">Login</a>
     </main>
   `,
   styles: [
@@ -16,16 +17,15 @@ import { Component } from '@angular/core';
         display: grid;
         place-content: center;
         text-align: center;
-        gap: 0.75rem;
       }
-
-      h1 {
-        margin: 0;
+      .login-entry {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #2563eb;
+        text-decoration: none;
       }
-
-      p {
-        margin: 0;
-        color: #4b5563;
+      .login-entry:hover {
+        text-decoration: underline;
       }
     `,
   ],
