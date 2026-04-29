@@ -41,32 +41,26 @@ function payloadCrearCatalogo(form: EjercicioFormData): Record<string, unknown> 
   standalone: true,
   imports: [CommonModule, EjercicioFormComponent],
   template: `
-    <div class="container py-5 animate-in">
-      <h1 class="page-title">{{ isEdit ? 'Editar ejercicio' : 'Nuevo ejercicio' }}</h1>
-      <p class="page-subtitle" *ngIf="!isEdit">
-        Se enviará al flujo de <strong>pendiente de validación</strong> (no se publica hasta las validaciones por
-        pares en el API).
-      </p>
-      <app-ejercicio-form
-        [initialData]="ejercicio"
-        [isEdit]="isEdit"
-        (formSubmit)="onSave($event)"
-        (cancelClick)="onCancel()"
-      >
-      </app-ejercicio-form>
+    <div class="edit-page animate-in">
+      <div class="container py-4">
+        <app-ejercicio-form
+          [initialData]="ejercicio"
+          [isEdit]="isEdit"
+          (formSubmit)="onSave($event)"
+          (cancelClick)="onCancel()"
+        >
+        </app-ejercicio-form>
+      </div>
     </div>
   `,
   styles: [`
-    .page-title {
-      font-size: var(--text-2xl);
-      font-weight: var(--font-bold);
-      color: var(--color-text-primary);
-      margin-bottom: var(--space-4);
+    .edit-page {
+      min-height: 100vh;
+      background-color: var(--color-bg-app);
     }
-    .page-subtitle {
-      font-size: var(--text-m);
-      color: var(--color-text-secondary);
-      margin-bottom: var(--space-5);
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
     }
   `]
 })
