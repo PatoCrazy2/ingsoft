@@ -11,19 +11,19 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   standalone: true,
   imports: [CommonModule, EjercicioPreviewComponent, ValidacionPanelComponent],
   template: `
-    <div class="container-fluid py-5">
+    <div class="container-fluid py-5 animate-in">
       <div class="row">
         <div class="col-lg-8">
           <div class="mb-4">
-             <h4 class="fw-bold">Revision de Ejercicio</h4>
-             <p class="text-secondary">Revisa el contenido antes de aprobar su publicación.</p>
+             <h1 class="page-title">Revisión de Ejercicio</h1>
+             <p class="page-subtitle">Revisa el contenido antes de aprobar su publicación.</p>
           </div>
           @if (ejercicio) {
             <app-ejercicio-preview [ejercicio]="ejercicio"></app-ejercicio-preview>
           }
         </div>
         <div class="col-lg-4">
-          <div class="sticky-top" style="top: 20px;">
+          <div class="sticky-top" style="top: var(--space-4);">
             <app-validacion-panel 
               (validated)="onValidate($event)">
             </app-validacion-panel>
@@ -31,7 +31,19 @@ import { MatSnackBar } from '@angular/material/snack-bar';
         </div>
       </div>
     </div>
-  `
+  `,
+  styles: [`
+    .page-title {
+      font-size: var(--text-xl);
+      font-weight: var(--font-bold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-1);
+    }
+    .page-subtitle {
+      font-size: var(--text-m);
+      color: var(--color-text-secondary);
+    }
+  `]
 })
 export class EjercicioValidationPage implements OnInit {
   private route = inject(ActivatedRoute);

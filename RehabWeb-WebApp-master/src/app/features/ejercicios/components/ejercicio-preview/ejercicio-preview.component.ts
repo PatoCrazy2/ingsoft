@@ -11,7 +11,7 @@ import { Ejercicio } from '../../models/ejercicio.model';
   standalone: true,
   imports: [CommonModule, MatIconModule, MatDividerModule, MatChipsModule, MatButtonModule],
   template: `
-    <div class="preview-container shadow-premium" *ngIf="ejercicio">
+    <div class="preview-container animate-in" *ngIf="ejercicio">
       <div class="media-section">
         <div class="overlay-controls p-4">
            <button mat-mini-fab color="white" class="back-btn" (click)="goBack()">
@@ -40,7 +40,7 @@ import { Ejercicio } from '../../models/ejercicio.model';
               <span class="difficulty-indicator" [ngClass]="(ejercicio.dificultad ?? 'FACIL').toLowerCase()"></span>
               <span class="small text-secondary fw-bold">{{ ejercicio.dificultad }}</span>
             </div>
-            <h1 class="display-5 fw-bold text-dark mb-0">{{ ejercicio.nombre }}</h1>
+            <h1 class="display-title">{{ ejercicio.nombre }}</h1>
           </div>
           <div class="score-pill">
             <mat-icon color="warn">star</mat-icon>
@@ -52,13 +52,13 @@ import { Ejercicio } from '../../models/ejercicio.model';
           <div class="col-lg-8">
             <section class="mb-5">
               <h3 class="detail-title">Sobre este ejercicio</h3>
-              <p class="lead text-secondary lh-lg">{{ ejercicio.descripcion }}</p>
+              <p class="lead-text">{{ ejercicio.descripcion }}</p>
             </section>
 
             <section class="mb-5">
               <h3 class="detail-title">Instrucciones de ejecución</h3>
               <div class="steps-container">
-                <div class="instruction-text p-4 rounded-4 bg-light border-start border-primary border-4">
+                <div class="instruction-text">
                   {{ ejercicio.instrucciones }}
                 </div>
               </div>
@@ -67,23 +67,23 @@ import { Ejercicio } from '../../models/ejercicio.model';
 
           <div class="col-lg-4">
             <div class="info-sidebar sticky-top" style="top: 2rem;">
-              <div class="info-card mb-4 p-4 rounded-4 bg-white border">
-                <h4 class="fw-bold mb-3 d-flex align-items-center">
+              <div class="info-card">
+                <h4 class="info-card-title">
                   <mat-icon class="me-2 text-primary">fitness_center</mat-icon> Equipamiento
                 </h4>
-                <p class="text-secondary mb-0">{{ ejercicio.material_necesario || 'Sin equipamiento especial' }}</p>
+                <p class="info-card-text">{{ ejercicio.material_necesario || 'Sin equipamiento especial' }}</p>
               </div>
 
               @if (ejercicio.evidencia_cientifica) {
-                <div class="info-card science-card p-4 rounded-4">
-                  <h4 class="fw-bold mb-3 d-flex align-items-center text-primary">
+                <div class="info-card science-card">
+                  <h4 class="info-card-title science-title">
                     <mat-icon class="me-2">verified</mat-icon> Base Científica
                   </h4>
-                  <p class="small text-secondary mb-0">{{ ejercicio.evidencia_cientifica }}</p>
+                  <p class="info-card-text science-text">{{ ejercicio.evidencia_cientifica }}</p>
                 </div>
               }
 
-              <div class="mt-4 p-3 d-flex align-items-center border rounded-4 bg-white">
+              <div class="mt-4 p-3 d-flex align-items-center border-box">
                 <div class="avatar me-3">J</div>
                 <div>
                   <div class="fw-bold small">Revisado por</div>
@@ -99,20 +99,17 @@ import { Ejercicio } from '../../models/ejercicio.model';
   styles: [`
     .preview-container {
       max-width: 1100px;
-      margin: 2rem auto 5rem;
-      background: white;
-      border-radius: 32px;
+      margin: var(--space-5) auto var(--space-8);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-xl);
       overflow: hidden;
-    }
-
-    .shadow-premium {
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+      box-shadow: var(--shadow-lg);
     }
 
     .media-section {
       height: 450px;
       position: relative;
-      background: #0f172a;
+      background: var(--color-text-primary);
     }
 
     .hero-image {
@@ -125,21 +122,22 @@ import { Ejercicio } from '../../models/ejercicio.model';
 
     .video-placeholder {
       height: 100%;
-      background: linear-gradient(45deg, #1e293b, #334155);
+      background: linear-gradient(45deg, var(--color-text-primary), var(--color-text-secondary));
     }
 
     .play-btn {
       width: 80px;
       height: 80px;
       background: white;
-      border-radius: 50%;
+      border-radius: var(--radius-pill);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: transform 0.2s;
-      mat-icon { font-size: 40px; width: 40px; height: 40px; color: #4f46e5; }
+      transition: transform var(--duration-base) var(--easing-default);
+      mat-icon { font-size: 40px; width: 40px; height: 40px; color: var(--color-primary); }
       &:hover { transform: scale(1.1); }
+      &:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }
     }
 
     .overlay-controls {
@@ -149,70 +147,124 @@ import { Ejercicio } from '../../models/ejercicio.model';
       z-index: 10;
     }
 
+    .detail-content {
+      padding: var(--space-7);
+    }
+
+    .display-title {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      color: var(--color-text-primary);
+      margin-bottom: 0;
+      line-height: var(--leading-tight);
+    }
+
     .detail-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      color: #1e293b;
+      font-size: var(--text-l);
+      font-weight: var(--font-bold);
+      margin-bottom: var(--space-4);
+      color: var(--color-text-primary);
+    }
+
+    .lead-text {
+      font-size: var(--text-m);
+      line-height: var(--leading-default);
+      color: var(--color-text-secondary);
     }
 
     .badge-premium {
-      background: #e0e7ff;
-      color: #4338ca;
-      padding: 4px 12px;
-      border-radius: 8px;
-      font-size: 0.75rem;
-      font-weight: 700;
+      background: var(--color-primary-low);
+      color: var(--color-primary);
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-md);
+      font-size: var(--text-xs);
+      font-weight: var(--font-bold);
       text-transform: uppercase;
     }
 
     .difficulty-indicator {
       width: 8px;
       height: 8px;
-      border-radius: 50%;
-      &.facil { background: #22c55e; }
-      &.intermedio { background: #eab308; }
-      &.dificil { background: #ef4444; }
+      border-radius: var(--radius-pill);
+      &.facil { background: var(--color-primary); }
+      &.intermedio { background: var(--color-warning); }
+      &.dificil { background: var(--color-danger); }
     }
 
     .score-pill {
       background: #fffbeb;
-      padding: 8px 16px;
-      border-radius: 100px;
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-pill);
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-weight: 700;
-      border: 1px solid #fde68a;
+      gap: var(--space-1);
+      font-weight: var(--font-bold);
+      border: 1px solid var(--color-warning);
     }
 
     .instruction-text {
       white-space: pre-wrap;
-      line-height: 1.8;
-      font-size: 1.1rem;
+      line-height: var(--leading-loose);
+      font-size: var(--text-m);
+      background: var(--color-bg-app);
+      border-left: 4px solid var(--color-primary);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+    }
+
+    .info-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+
+    .info-card-title {
+      font-size: var(--text-m);
+      font-weight: var(--font-bold);
+      margin-bottom: var(--space-3);
+      display: flex;
+      align-items: center;
+    }
+
+    .info-card-text {
+      font-size: var(--text-s);
+      color: var(--color-text-secondary);
+      margin-bottom: 0;
     }
 
     .science-card {
-      background: #f0f9ff;
-      border: 1px solid #bae6fd;
+      background: var(--color-primary-low);
+      border-color: var(--color-primary);
+    }
+
+    .science-title {
+      color: var(--color-primary);
+    }
+
+    .border-box {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-bg-card);
     }
 
     .avatar {
       width: 40px;
       height: 40px;
-      background: #4f46e5;
+      background: var(--color-primary);
       color: white;
-      border-radius: 50%;
+      border-radius: var(--radius-pill);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
+      font-weight: var(--font-bold);
     }
 
-    .smaller { font-size: 0.75rem; }
+    .smaller { font-size: var(--text-xs); }
 
     @media (max-width: 992px) {
-      .detail-content { padding: 2rem !important; }
+      .detail-content { padding: var(--space-5); }
       .media-section { height: 300px; }
     }
   `]

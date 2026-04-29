@@ -41,9 +41,9 @@ function payloadCrearCatalogo(form: EjercicioFormData): Record<string, unknown> 
   standalone: true,
   imports: [CommonModule, EjercicioFormComponent],
   template: `
-    <div class="container py-5">
-      <h1 class="mb-4">{{ isEdit ? 'Editar ejercicio' : 'Nuevo ejercicio' }}</h1>
-      <p class="text-secondary mb-4" *ngIf="!isEdit">
+    <div class="container py-5 animate-in">
+      <h1 class="page-title">{{ isEdit ? 'Editar ejercicio' : 'Nuevo ejercicio' }}</h1>
+      <p class="page-subtitle" *ngIf="!isEdit">
         Se enviará al flujo de <strong>pendiente de validación</strong> (no se publica hasta las validaciones por
         pares en el API).
       </p>
@@ -56,6 +56,19 @@ function payloadCrearCatalogo(form: EjercicioFormData): Record<string, unknown> 
       </app-ejercicio-form>
     </div>
   `,
+  styles: [`
+    .page-title {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-4);
+    }
+    .page-subtitle {
+      font-size: var(--text-m);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-5);
+    }
+  `]
 })
 export class EjercicioEditPage implements OnInit {
   private route = inject(ActivatedRoute);

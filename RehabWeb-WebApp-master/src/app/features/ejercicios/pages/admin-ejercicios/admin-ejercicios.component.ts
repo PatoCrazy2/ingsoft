@@ -26,7 +26,7 @@ import { Ejercicio } from '../../models/ejercicio.model';
     RouterLink
   ],
   template: `
-    <div class="admin-container">
+    <div class="admin-container animate-in">
       <header class="admin-header d-flex justify-content-between align-items-end mb-5">
         <div>
           <nav aria-label="breadcrumb">
@@ -35,15 +35,15 @@ import { Ejercicio } from '../../models/ejercicio.model';
               <li class="breadcrumb-item active">Admin</li>
             </ol>
           </nav>
-          <h1 class="display-6 fw-bold mb-0">Gestión de Contenido</h1>
-          <p class="text-secondary mb-0">Controla la calidad y publicación del catálogo terapéutico.</p>
+          <h1 class="admin-title">Gestión de Contenido</h1>
+          <p class="admin-subtitle">Controla la calidad y publicación del catálogo terapéutico.</p>
         </div>
         <button mat-flat-button color="primary" routerLink="/ejercicios/admin/nuevo" class="add-btn">
           <mat-icon>add</mat-icon> NUEVO EJERCICIO
         </button>
       </header>
 
-      <div class="dashboard-card shadow-sm">
+      <div class="dashboard-card">
         <div class="table-responsive">
           <table mat-table [dataSource]="ejercicios()" class="w-100">
             
@@ -69,8 +69,10 @@ import { Ejercicio } from '../../models/ejercicio.model';
             <ng-container matColumnDef="estado">
               <th mat-header-cell *matHeaderCellDef>ESTADO</th>
               <td mat-cell *matCellDef="let e">
-                <div class="status-pill" [ngClass]="e.estado.toLowerCase()">
-                  <div class="status-indicator"></div>
+                <div class="badge" 
+                     [class.badge--published]="e.estado === 'PUBLICADO'"
+                     [class.badge--pending]="e.estado === 'PENDIENTE_VALIDACION'"
+                     [class.badge--draft]="e.estado === 'BORRADOR'">
                   {{ e.estado.replace('_', ' ') }}
                 </div>
               </td>
@@ -116,124 +118,128 @@ import { Ejercicio } from '../../models/ejercicio.model';
     .admin-container {
       max-width: 1300px;
       margin: 0 auto;
-      padding: 3rem 2rem;
+      padding: var(--space-8) var(--space-4);
+    }
+
+    .admin-title {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-1);
+    }
+
+    .admin-subtitle {
+      font-size: var(--text-m);
+      color: var(--color-text-secondary);
     }
 
     .breadcrumb-item a {
       text-decoration: none;
-      color: var(--primary-color);
-      font-size: 0.9rem;
+      color: var(--color-primary);
+      font-size: var(--text-s);
+      transition: color var(--duration-base);
+      &:hover { color: var(--color-primary-low); }
     }
 
     .add-btn {
-      padding: 0.5rem 1.5rem;
-      border-radius: 12px !important;
-      font-weight: 600;
+      padding: var(--space-2) var(--space-5);
+      border-radius: var(--radius-xl) !important;
+      font-weight: var(--font-bold);
       height: 48px;
+      background: var(--color-primary);
+      transition: transform var(--duration-fast), filter var(--duration-base);
+      &:hover { transform: translateY(-1px); filter: brightness(1.1); }
+      &:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }
     }
 
     .dashboard-card {
-      background: white;
-      border-radius: 20px;
-      border: 1px solid #eef2f6;
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-sm);
       overflow: hidden;
     }
 
     .mat-mdc-table { background: transparent; }
     
     .mat-mdc-header-cell {
-      background: #f8fafc;
-      color: #64748b;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      padding: 1rem 1.5rem;
+      background: var(--color-bg-app);
+      color: var(--color-text-secondary);
+      font-size: var(--text-xs);
+      font-weight: var(--font-bold);
+      letter-spacing: var(--tracking-wide);
+      padding: var(--space-3) var(--space-4);
     }
 
     .table-row {
-      transition: background 0.2s;
-    }
-    
-    .table-row:hover {
-      background: #f1f5f9;
+      transition: background var(--duration-base) var(--easing-default);
+      &:hover { background: var(--color-bg-app); }
     }
 
     .exercise-cell {
       display: flex;
       align-items: center;
-      padding: 0.5rem 1.5rem;
+      padding: var(--space-2) var(--space-4);
     }
 
     .image-box {
       width: 50px;
       height: 50px;
-      border-radius: 12px;
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      background: #f1f5f9;
+      background: var(--color-border);
     }
 
     .image-box img { width: 100%; height: 100%; object-fit: cover; }
 
     .exercise-name {
-      font-weight: 600;
-      color: #1e293b;
-      font-size: 1rem;
+      font-weight: var(--font-bold);
+      color: var(--color-text-primary);
+      font-size: var(--text-m);
     }
 
     .exercise-meta {
-      font-size: 0.8rem;
-      color: #64748b;
+      font-size: var(--text-s);
+      color: var(--color-text-secondary);
+      .dot { margin: 0 var(--space-1); opacity: 0.5; }
     }
 
-    .exercise-meta .dot { margin: 0 5px; opacity: 0.5; }
-
-    .status-pill {
+    .badge {
       display: inline-flex;
       align-items: center;
-      padding: 4px 12px;
-      border-radius: 8px;
-      font-size: 0.7rem;
-      font-weight: 700;
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-pill);
+      font-size: var(--text-xs);
+      font-weight: var(--font-bold);
       text-transform: uppercase;
-      letter-spacing: 0.025em;
-    }
-      
-    .status-indicator {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      margin-right: 8px;
-    }
+      letter-spacing: var(--tracking-wide);
 
-    .status-pill.borrador {
-      background: #f1f5f9; color: #475569;
+      &--published { background: var(--color-primary-low); color: var(--color-primary); }
+      &--pending { 
+        background: #FFF8E6; color: var(--color-warning); 
+        animation: pulse-glow 2s infinite;
+      }
+      &--draft { 
+        background: var(--color-bg-app); 
+        color: var(--color-text-secondary);
+        border: 1px solid var(--color-border);
+      }
     }
-    .status-pill.borrador .status-indicator { background: #64748b; }
-
-    .status-pill.pendiente_validacion {
-      background: #fefce8; color: #854d0e;
-    }
-    .status-pill.pendiente_validacion .status-indicator { background: #eab308; }
-
-    .status-pill.publicado {
-      background: #f0fdf4; color: #166534;
-    }
-    .status-pill.publicado .status-indicator { background: #22c55e; }
 
     .action-btn {
-      color: #64748b;
+      color: var(--color-text-secondary);
+      transition: all var(--duration-base);
+      &:hover { background: var(--color-primary-low); color: var(--color-primary); }
+      &.preview:hover { color: var(--color-info); }
+      &:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }
     }
-    
-    .action-btn:hover { background: #e2e8f0; color: #1e293b; }
-    
-    .action-btn.preview:hover { color: #4f46e5; }
 
     .validate-btn {
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 0 12px !important;
+      font-size: var(--text-xs);
+      font-weight: var(--font-bold);
+      padding: 0 var(--space-3) !important;
       height: 32px;
-      border-radius: 8px !important;
+      border-radius: var(--radius-md) !important;
     }
   `]
 })

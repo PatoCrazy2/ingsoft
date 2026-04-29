@@ -23,7 +23,7 @@ import { Ejercicio, EjercicioFormData } from '../../models/ejercicio.model';
     MatSnackBarModule
   ],
   template: `
-    <div class="form-wrapper py-4">
+    <div class="form-wrapper py-4 animate-in">
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="glass-form">
         <div class="form-header mb-5">
            <h2 class="form-title">{{ isEdit ? 'Actualizar Ejercicio' : 'Detalles del Nuevo Ejercicio' }}</h2>
@@ -129,63 +129,70 @@ import { Ejercicio, EjercicioFormData } from '../../models/ejercicio.model';
     .glass-form {
       max-width: 900px;
       margin: 0 auto;
-      background: white;
-      padding: 3.5rem;
-      border-radius: 30px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.04);
-      border: 1px solid #f1f5f9;
+      background: var(--color-bg-card);
+      padding: var(--space-7);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--color-border);
     }
 
     .form-title {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #0f172a;
-      letter-spacing: -0.025em;
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      color: var(--color-text-primary);
+      letter-spacing: var(--tracking-normal);
+      margin-bottom: var(--space-2);
     }
 
     .form-subtitle {
-     color: #64748b;
-     font-size: 1.1rem;
+     color: var(--color-text-secondary);
+     font-size: var(--text-m);
     }
 
     .section-title {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #64748b;
+      font-size: var(--text-xs);
+      font-weight: var(--font-bold);
+      color: var(--color-text-secondary);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 1.5rem;
+      letter-spacing: var(--tracking-wide);
+      margin-bottom: var(--space-4);
       display: flex;
       align-items: center;
-      mat-icon { margin-right: 8px; font-size: 20px; width: 20px; height: 20px;}
+      mat-icon { margin-right: var(--space-2); font-size: 20px; width: 20px; height: 20px;}
     }
 
     .dark-field ::ng-deep .mat-mdc-form-field-flex {
-      background-color: #f8fafc !important;
-      border-radius: 12px !important;
-      transition: all 0.2s;
+      background-color: var(--color-bg-app) !important;
+      border-radius: var(--radius-sm) !important;
+      transition: all var(--duration-base) var(--easing-default);
     }
 
     .dark-field ::ng-deep .mat-mdc-form-field-focus-overlay {
-      background-color: white !important;
+      background-color: var(--color-bg-card) !important;
     }
 
     .submit-btn {
       height: 56px;
-      border-radius: 16px !important;
-      font-weight: 600;
-      font-size: 1rem;
-      box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+      border-radius: var(--radius-xl) !important;
+      font-weight: var(--font-bold);
+      font-size: var(--text-m);
+      background: var(--color-primary);
+      transition: transform var(--duration-fast), filter var(--duration-base);
+      &:hover { transform: translateY(-1px); filter: brightness(1.1); }
+      &:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }
     }
 
     .cancel-btn {
       height: 56px;
-      border-radius: 16px !important;
-      font-weight: 600;
+      border-radius: var(--radius-xl) !important;
+      font-weight: var(--font-bold);
+      transition: background var(--duration-base);
+      &:hover { background: var(--color-danger-bg); }
+      &:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }
     }
 
     @media (max-width: 768px) {
-      .glass-form { padding: 1.5rem; }
+      .glass-form { padding: var(--space-4); }
     }
   `]
 })
