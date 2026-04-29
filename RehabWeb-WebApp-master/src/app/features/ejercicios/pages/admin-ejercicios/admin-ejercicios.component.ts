@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal, computed, effect } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
@@ -12,6 +12,8 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { EjercicioService } from '../../services/ejercicio.service';
 import { Ejercicio } from '../../models/ejercicio.model';
+import { FormsModule } from '@angular/forms';
+
 
 @Component({
   selector: 'app-admin-ejercicios',
@@ -23,7 +25,8 @@ import { Ejercicio } from '../../models/ejercicio.model';
     MatIconModule, 
     MatChipsModule, 
     MatTooltipModule,
-    RouterLink
+    RouterLink,
+    FormsModule
   ],
   template: `
     <div class="admin-container animate-in">
@@ -43,9 +46,33 @@ import { Ejercicio } from '../../models/ejercicio.model';
         </button>
       </header>
 
+      <div class="admin-filters mb-4">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="search-bar">
+              <svg class="search-bar__icon" xmlns="http://www.w3.org/2000/svg"
+                   viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input type="search" placeholder="Buscar por nombre o categoría..." 
+                     [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
+            </div>
+          </div>
+          <div class="col-md-3">
+            <select class="field__select" [ngModel]="estadoFiltro()" (ngModelChange)="estadoFiltro.set($event)">
+              <option value="">Todos los estados</option>
+              <option value="PUBLICADO">Publicado</option>
+              <option value="PENDIENTE_VALIDACION">Pendiente</option>
+              <option value="BORRADOR">Borrador</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <div class="dashboard-card">
         <div class="table-responsive">
-          <table mat-table [dataSource]="ejercicios()" class="w-100">
+          <table mat-table [dataSource]="ejerciciosFiltrados()" class="w-100">
             
             <ng-container matColumnDef="nombre">
               <th mat-header-cell *matHeaderCellDef>DETALLES DEL EJERCICIO</th>
@@ -241,6 +268,138 @@ import { Ejercicio } from '../../models/ejercicio.model';
       height: 32px;
       border-radius: var(--radius-md) !important;
     }
+
+    /* ── ALTURA BASE UNIFORME para todos los controles ── */
+    $control-height: 40px;
+
+    /* ── INPUT ESTÁNDAR ── */
+    .field__input,
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="search"],
+    input[type="url"],
+    textarea.field__textarea {
+      display: block;
+      width: 100%;
+      height: $control-height;          /* altura fija — elimina desbordes */
+      padding: 0 var(--space-3);        /* padding horizontal, sin vertical */
+      font-family: var(--font-family);
+      font-size: var(--text-s);
+      font-weight: var(--font-regular);
+      color: var(--color-text-primary);
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      outline: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;          /* placeholder/texto largo no desborda */
+      transition: border-color var(--duration-base) var(--easing-default),
+                  box-shadow var(--duration-base) var(--easing-default);
+
+      &::placeholder {
+        color: var(--color-text-muted);
+        font-size: var(--text-s);
+        line-height: $control-height;   /* centra el placeholder verticalmente */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &:focus {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(0, 167, 129, 0.15);
+        outline: none;
+      }
+
+      &:disabled {
+        color: var(--color-text-muted);
+        cursor: not-allowed;
+        border-color: var(--color-border);
+      }
+
+      &::-webkit-search-decoration,
+      &::-webkit-search-cancel-button,
+      &::-webkit-search-results-button,
+      &::-webkit-search-results-decoration { display: none; }
+    }
+
+    /* ── SELECT ── */
+    select,
+    .field__select {
+      display: block;
+      width: 100%;
+      height: $control-height;
+      padding: 0 var(--space-6) 0 var(--space-3);
+      font-family: var(--font-family);
+      font-size: var(--text-s);
+      font-weight: var(--font-regular);
+      color: var(--color-text-primary);
+      background-color: var(--color-bg-card);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23707E8C' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right var(--space-3) center;
+      background-size: 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      transition: border-color var(--duration-base) var(--easing-default),
+                  box-shadow var(--duration-base) var(--easing-default);
+
+      &:focus {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(0, 167, 129, 0.15);
+      }
+    }
+
+    /* ── BARRA DE BÚSQUEDA CON ÍCONO ── */
+    .search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+
+      &__icon {
+        position: absolute;
+        left: var(--space-3);
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        color: var(--color-text-muted);
+        pointer-events: none;
+        flex-shrink: 0;
+        z-index: 1;
+      }
+
+      input {
+        height: $control-height;
+        padding-left: calc(var(--space-3) + 18px + var(--space-2));
+        padding-right: var(--space-3);
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--color-border);
+        background: var(--color-bg-card);
+        font-family: var(--font-family);
+        font-size: var(--text-s);
+        color: var(--color-text-primary);
+        width: 100%;
+        outline: none;
+        transition: border-color var(--duration-base) var(--easing-default),
+                    box-shadow var(--duration-base) var(--easing-default);
+
+        &::placeholder { color: var(--color-text-muted); font-size: var(--text-s); }
+        &:focus {
+          border-color: var(--color-primary);
+          box-shadow: 0 0 0 3px rgba(0, 167, 129, 0.15);
+        }
+      }
+    }
   `]
 })
 export class AdminEjerciciosPage implements OnInit {
@@ -250,10 +409,28 @@ export class AdminEjerciciosPage implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   ejercicios = this.ejercicioService.ejercicios;
+  searchTerm = signal('');
+  estadoFiltro = signal('');
+  
+  ejerciciosFiltrados = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    const estado = this.estadoFiltro();
+    const lista = this.ejercicios();
+
+    return lista.filter(e => {
+      const matchesTerm = !term || 
+        e.nombre.toLowerCase().includes(term) || 
+        (e.categoria ?? '').toLowerCase().includes(term);
+      const matchesEstado = !estado || e.estado === estado;
+      return matchesTerm && matchesEstado;
+    });
+  });
+
   displayedColumns: string[] = ['nombre', 'estado', 'dificultad', 'acciones'];
 
   ngOnInit(): void {
     this.recargar();
+    
     this.router.events
       .pipe(
         filter((e): e is NavigationEnd => e instanceof NavigationEnd),
