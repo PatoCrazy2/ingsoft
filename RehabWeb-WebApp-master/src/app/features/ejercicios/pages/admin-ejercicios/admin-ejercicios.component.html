@@ -1,0 +1,115 @@
+<div class="adm-page">
+  <div class="adm-shell">
+    <nav class="adm-nav" aria-label="Secciones">
+      <a routerLink="/home" class="adm-nav__link">Inicio</a>
+      <span class="adm-nav__sep" aria-hidden="true"></span>
+      <a routerLink="/ejercicios" class="adm-nav__link">Biblioteca</a>
+      <span class="adm-nav__sep" aria-hidden="true"></span>
+      <span class="adm-nav__current">Administración</span>
+      <div class="adm-nav__actions">
+        <a routerLink="/ejercicios/admin/nuevo" class="adm-nav__cta">
+          <span class="adm-nav__cta-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" focusable="false">
+              <path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 5v14M5 12h14" />
+            </svg>
+          </span>
+          Nuevo ejercicio
+        </a>
+      </div>
+    </nav>
+
+    <header class="adm-hero">
+      <p class="adm-hero__kicker">Panel terapeuta</p>
+      <h1 class="adm-hero__title">Gestión de contenido</h1>
+      <p class="adm-hero__subtitle">
+        Revisa estados, edita fichas y envía ejercicios a validación o publicación según el flujo del API.
+      </p>
+    </header>
+
+    <section class="adm-panel" aria-label="Listado de ejercicios">
+      <div class="adm-panel__inner">
+        <div class="table-responsive adm-table-wrap">
+          <table mat-table [dataSource]="ejercicios()" class="adm-table w-100">
+            <ng-container matColumnDef="nombre">
+              <th mat-header-cell *matHeaderCellDef>Ejercicio</th>
+              <td mat-cell *matCellDef="let e">
+                <div class="exercise-cell">
+                  <div class="image-box">
+                    <img [src]="e.imagen_url || 'assets/placeholder-exercise.jpg'" alt="" />
+                  </div>
+                  <div>
+                    <div class="exercise-name">{{ e.nombre }}</div>
+                    <div class="exercise-meta">
+                      <span class="category">{{ e.categoria }}</span>
+                      <span class="dot">·</span>
+                      <span class="diff">{{ e.dificultad }}</span>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="estado">
+              <th mat-header-cell *matHeaderCellDef>Estado</th>
+              <td mat-cell *matCellDef="let e">
+                <div class="status-pill" [ngClass]="e.estado.toLowerCase()">
+                  <div class="status-indicator"></div>
+                  {{ e.estado.replace('_', ' ') }}
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="dificultad">
+              <th mat-header-cell *matHeaderCellDef>Valoración</th>
+              <td mat-cell *matCellDef="let e">
+                <div class="adm-rating">
+                  <span class="adm-star" aria-hidden="true">★</span>
+                  <span>{{ e.puntuacion_media || 'N/A' }}</span>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let e">
+                <div class="adm-actions">
+                  <button
+                    mat-icon-button
+                    type="button"
+                    class="action-btn"
+                    [routerLink]="['/ejercicios/admin', e.id, 'editar']"
+                    matTooltip="Editar"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    type="button"
+                    class="action-btn preview"
+                    [routerLink]="['/ejercicios/admin', e.id, 'preview']"
+                    matTooltip="Vista previa"
+                  >
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  @if (e.estado === 'PENDIENTE_VALIDACION') {
+                    <a
+                      mat-raised-button
+                      color="accent"
+                      class="validate-btn"
+                      [routerLink]="['/ejercicios/admin', e.id, 'validaciones']"
+                    >
+                      Validar
+                    </a>
+                  }
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns" class="table-row"></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

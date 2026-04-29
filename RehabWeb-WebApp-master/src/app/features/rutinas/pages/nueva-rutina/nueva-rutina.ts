@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,7 +9,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '../../../../core/auth/auth.service';
 import { EjercicioCardComponent } from '../../../ejercicios/components/ejercicio-card/ejercicio-card.component';
 import { EjercicioService } from '../../../ejercicios/services/ejercicio.service';
 import { NuevaRutinaStateService } from '../../services/nueva-rutina-state';
@@ -32,28 +31,21 @@ import { PacienteListItem, PacienteService } from '../../services/paciente';
   templateUrl: './nueva-rutina.html',
   styleUrl: './nueva-rutina.scss',
 })
-export class NuevaRutinaPage implements OnInit {
+export class NuevaRutinaPage {
   private readonly pacientesApi = inject(PacienteService);
   private readonly ejerciciosApi = inject(EjercicioService);
   private readonly destroyRef = inject(DestroyRef);
   readonly estado = inject(NuevaRutinaStateService);
-  readonly auth = inject(AuthService);
 
   pacientes: PacienteListItem[] = [];
   pacienteIdSeleccion: string | null = null;
 
   constructor() {
-    this.auth.sesionLista$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this._cargarPacientesTrasSesion());
-  }
-
-  ngOnInit(): void {
-    void this.auth.asegurarTokenDemo().then(() => this._cargarPacientesTrasSesion());
+    afterNextRender(() => this._cargarPacientesTrasSesion());
   }
 
   cargarPacientes(): void {
-    void this.auth.asegurarTokenDemo().then(() => this._cargarPacientesTrasSesion());
+    this._cargarPacientesTrasSesion();
   }
 
   private _cargarPacientesTrasSesion(): void {
@@ -61,31 +53,29 @@ export class NuevaRutinaPage implements OnInit {
     this.estado.errorPacientes.set(null);
     this.estado.errorEjercicios.set(null);
     this.estado.requiereInicioSesion.set(false);
-    this.pacientesApi.listar().subscribe({
-      next: (lista) => {
-        this.pacientes = lista;
-        this.estado.cargandoPacientes.set(false);
-        this.estado.errorPacientes.set(null);
-        const prev = this.estado.pacienteSeleccionado();
-        if (prev && 'paciente_id' in prev) {
-          this.pacienteIdSeleccion = prev.paciente_id;
-          this.alCambiarPaciente(this.pacienteIdSeleccion);
-        }
-      },
-      error: (err: HttpErrorResponse) => {
-        this.estado.cargandoPacientes.set(false);
-        this.pacientes = [];
-        if (err.status === 401 || err.status === 403) {
-          this.estado.requiereInicioSesion.set(true);
+    this.pacientesApi
+      .listar()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (lista) => {
+          this.pacientes = lista;
+          this.estado.cargandoPacientes.set(false);
           this.estado.errorPacientes.set(null);
-        } else {
+          const prev = this.estado.pacienteSeleccionado();
+          if (prev && 'paciente_id' in prev) {
+            this.pacienteIdSeleccion = prev.paciente_id;
+            this.alCambiarPaciente(this.pacienteIdSeleccion);
+          }
+        },
+        error: () => {
+          this.estado.cargandoPacientes.set(false);
+          this.pacientes = [];
           this.estado.requiereInicioSesion.set(false);
           this.estado.errorPacientes.set(
-            'No se pudo cargar el listado de pacientes. Arranca Docker (docker compose up -d), deja el API accesible en localhost:8002 (ver proxy.conf.json) y ejecuta python manage.py seed_demo en el contenedor del backend.',
+            'No se pudo cargar el listado de pacientes. El servicio debería devolver datos mock si el fallo es de red; si ves este mensaje, revisa la consola del navegador.',
           );
-        }
-      },
-    });
+        },
+      });
   }
 
   alCambiarPaciente(id: string | null): void {
@@ -99,8 +89,7 @@ export class NuevaRutinaPage implements OnInit {
     this.estado.pacienteSeleccionado.set(p);
     this.estado.cargandoEjercicios.set(true);
     this.estado.errorEjercicios.set(null);
-    void this.auth.asegurarTokenDemo().then(() => {
-      this.ejerciciosApi.getEjerciciosPrefiltradosPorPaciente(id).subscribe({
+    this.ejerciciosApi.getEjerciciosPrefiltradosPorPaciente(id).subscribe({
       next: (ej) => {
         this.estado.ejerciciosPrefiltrados.set(ej);
         this.estado.cargandoEjercicios.set(false);
@@ -111,10 +100,6 @@ export class NuevaRutinaPage implements OnInit {
         this.estado.ejerciciosPrefiltrados.set([]);
         const body = err.error;
         let msg = 'No se pudieron cargar ejercicios para este paciente.';
-        if (err.status === 401 || err.status === 403) {
-          msg = 'Sesión no válida. Vuelve a iniciar sesión.';
-          this.estado.requiereInicioSesion.set(true);
-        }
         if (body?.paciente) {
           const v = body.paciente;
           msg = Array.isArray(v) ? v[0] : String(v);
@@ -123,7 +108,6 @@ export class NuevaRutinaPage implements OnInit {
         }
         this.estado.errorEjercicios.set(msg);
       },
-    });
     });
   }
 }

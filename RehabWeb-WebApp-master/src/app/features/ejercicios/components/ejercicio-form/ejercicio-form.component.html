@@ -1,0 +1,204 @@
+<div class="ef-wrap">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="ef-form glass-form" autocomplete="off">
+    <div class="ef-form__header">
+      <h2 class="ef-form__title">{{ isEdit ? 'Actualizar ejercicio' : 'Detalles del nuevo ejercicio' }}</h2>
+      <p class="ef-form__subtitle">
+        Completa la ficha técnica. Los campos de texto no admiten pegar ni caracteres tipo @ , ? &lt; &gt; ni
+        comas (evita copiar resultados de búsqueda). Las URLs deben empezar por http:// o https://.
+      </p>
+    </div>
+
+    <div class="ef-section">
+      <h3 class="ef-section__title">
+        <mat-icon>info</mat-icon>
+        Información básica
+      </h3>
+      <div class="ef-grid ef-grid--name-diff">
+        <mat-form-field appearance="outline" class="ef-field ef-field--name">
+          <mat-label>Nombre del ejercicio</mat-label>
+          <input
+            matInput
+            formControlName="nombre"
+            maxlength="140"
+            placeholder="Ej. elevación lateral de hombro"
+            (paste)="bloquearPegado($event)"
+            (copy)="bloquearCopia($event)"
+            (cut)="bloquearCopia($event)"
+          />
+          <mat-icon matPrefix class="ef-field__prefix">fitness_center</mat-icon>
+          <mat-hint align="end">{{ longitud('nombre') }}/140</mat-hint>
+          <mat-error *ngIf="form.get('nombre')?.hasError('required')">El nombre es obligatorio</mat-error>
+          <mat-error *ngIf="form.get('nombre')?.hasError('minlength')">Mínimo 3 caracteres</mat-error>
+          <mat-error *ngIf="form.get('nombre')?.hasError('caracteresBusqueda')"
+            >No uses @ , ? ni comas</mat-error
+          >
+          <mat-error *ngIf="form.get('nombre')?.hasError('etiquetasHtml')">No uses &lt; o &gt;</mat-error>
+          <mat-error *ngIf="form.get('nombre')?.hasError('dosPuntosNoPermitido')">No uses dos puntos en el nombre</mat-error>
+          <mat-error *ngIf="form.get('nombre')?.hasError('maxlength')">Máximo 140 caracteres</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="ef-field ef-field--diff">
+          <mat-label>Dificultad</mat-label>
+          <mat-select formControlName="dificultad">
+            <mat-option value="FACIL">Fácil</mat-option>
+            <mat-option value="INTERMEDIO">Intermedio</mat-option>
+            <mat-option value="DIFICIL">Difícil</mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('dificultad')?.hasError('required')">Elige una dificultad</mat-error>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="ef-field ef-field--full">
+        <mat-label>Descripción breve</mat-label>
+        <textarea
+          matInput
+          formControlName="descripcion"
+          rows="3"
+          maxlength="800"
+          placeholder="Objetivo terapéutico y población diana"
+          (paste)="bloquearPegado($event)"
+          (copy)="bloquearCopia($event)"
+          (cut)="bloquearCopia($event)"
+        ></textarea>
+        <mat-hint align="end">{{ longitud('descripcion') }}/800 (mín. 20)</mat-hint>
+        <mat-error *ngIf="form.get('descripcion')?.hasError('required')">La descripción es obligatoria</mat-error>
+        <mat-error *ngIf="form.get('descripcion')?.hasError('minlength')">Mínimo 20 caracteres</mat-error>
+        <mat-error *ngIf="form.get('descripcion')?.hasError('caracteresBusqueda')"
+          >No uses @ , ? ni comas</mat-error
+        >
+        <mat-error *ngIf="form.get('descripcion')?.hasError('etiquetasHtml')">No uses &lt; o &gt;</mat-error>
+        <mat-error *ngIf="form.get('descripcion')?.hasError('dosPuntosNoPermitido')"
+          >No uses dos puntos en la descripción</mat-error
+        >
+        <mat-error *ngIf="form.get('descripcion')?.hasError('maxlength')">Máximo 800 caracteres</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="ef-section">
+      <h3 class="ef-section__title">
+        <mat-icon>list_alt</mat-icon>
+        Guía terapéutica
+      </h3>
+      <mat-form-field appearance="outline" class="ef-field ef-field--full">
+        <mat-label>Instrucciones paso a paso</mat-label>
+        <textarea
+          matInput
+          formControlName="instrucciones"
+          rows="7"
+          maxlength="4000"
+          placeholder="1) Posición inicial&#10;2) Ejecución&#10;3) Finalización"
+          (paste)="bloquearPegado($event)"
+          (copy)="bloquearCopia($event)"
+          (cut)="bloquearCopia($event)"
+        ></textarea>
+        <mat-hint align="end">{{ longitud('instrucciones') }}/4000 (mín. 40)</mat-hint>
+        <mat-error *ngIf="form.get('instrucciones')?.hasError('required')">Las instrucciones son obligatorias</mat-error>
+        <mat-error *ngIf="form.get('instrucciones')?.hasError('minlength')">Mínimo 40 caracteres</mat-error>
+        <mat-error *ngIf="form.get('instrucciones')?.hasError('caracteresBusqueda')"
+          >No uses @ , ? ni comas</mat-error
+        >
+        <mat-error *ngIf="form.get('instrucciones')?.hasError('etiquetasHtml')">No uses &lt; o &gt;</mat-error>
+        <mat-error *ngIf="form.get('instrucciones')?.hasError('maxlength')">Máximo 4000 caracteres</mat-error>
+      </mat-form-field>
+
+      <div class="ef-grid ef-grid--2">
+        <mat-form-field appearance="outline" class="ef-field">
+          <mat-label>Material necesario</mat-label>
+          <input
+            matInput
+            formControlName="material_necesario"
+            maxlength="200"
+            placeholder="Ej. banda elástica suave"
+            (paste)="bloquearPegado($event)"
+            (copy)="bloquearCopia($event)"
+            (cut)="bloquearCopia($event)"
+          />
+          <mat-icon matPrefix class="ef-field__prefix">handyman</mat-icon>
+          <mat-hint align="end">{{ longitud('material_necesario') }}/200</mat-hint>
+          <mat-error *ngIf="form.get('material_necesario')?.hasError('required')">Indica el material</mat-error>
+          <mat-error *ngIf="form.get('material_necesario')?.hasError('caracteresBusqueda')"
+            >No uses @ , ? ni comas</mat-error
+          >
+          <mat-error *ngIf="form.get('material_necesario')?.hasError('etiquetasHtml')">No uses &lt; o &gt;</mat-error>
+          <mat-error *ngIf="form.get('material_necesario')?.hasError('dosPuntosNoPermitido')"
+            >No uses dos puntos aquí</mat-error
+          >
+          <mat-error *ngIf="form.get('material_necesario')?.hasError('maxlength')">Máximo 200 caracteres</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="ef-field">
+          <mat-label>Categoría</mat-label>
+          <mat-select formControlName="categoria">
+            <mat-option value="FUERZA">Fuerza</mat-option>
+            <mat-option value="MOVILIDAD">Movilidad</mat-option>
+            <mat-option value="EQUILIBRIO">Equilibrio</mat-option>
+            <mat-option value="POSTURAL">Higiene postural</mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('categoria')?.hasError('required')">Elige una categoría</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="ef-section">
+      <h3 class="ef-section__title">
+        <mat-icon>perm_media</mat-icon>
+        Multimedia y ciencia
+      </h3>
+      <div class="ef-grid ef-grid--2">
+        <mat-form-field appearance="outline" class="ef-field">
+          <mat-label>URL del vídeo</mat-label>
+          <input matInput formControlName="video_url" placeholder="https://..." maxlength="500" />
+          <mat-icon matSuffix>play_circle</mat-icon>
+          <mat-hint>Opcional. Solo http(s). Máx. 500 caracteres.</mat-hint>
+          <mat-error *ngIf="form.get('video_url')?.hasError('urlHttp')">Debe ser una URL http o https válida</mat-error>
+          <mat-error *ngIf="form.get('video_url')?.hasError('maxlength')">Máximo 500 caracteres</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="ef-field">
+          <mat-label>URL de imagen</mat-label>
+          <input matInput formControlName="imagen_url" placeholder="https://..." maxlength="500" />
+          <mat-icon matSuffix>add_photo_alternate</mat-icon>
+          <mat-error *ngIf="form.get('imagen_url')?.hasError('urlHttp')">Debe ser una URL http o https válida</mat-error>
+          <mat-error *ngIf="form.get('imagen_url')?.hasError('maxlength')">Máximo 500 caracteres</mat-error>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="ef-field ef-field--full">
+        <mat-label>Base científica / evidencia</mat-label>
+        <textarea
+          matInput
+          formControlName="evidencia_cientifica"
+          rows="4"
+          maxlength="2000"
+          placeholder="Referencias o justificación (sin @ ni comas)"
+          (paste)="bloquearPegado($event)"
+          (copy)="bloquearCopia($event)"
+          (cut)="bloquearCopia($event)"
+        ></textarea>
+        <mat-icon matSuffix>science</mat-icon>
+        <mat-hint align="end">{{ longitud('evidencia_cientifica') }}/2000</mat-hint>
+        <mat-error *ngIf="form.get('evidencia_cientifica')?.hasError('caracteresBusqueda')"
+          >No uses @ , ? ni comas</mat-error
+        >
+        <mat-error *ngIf="form.get('evidencia_cientifica')?.hasError('etiquetasHtml')">No uses &lt; o &gt;</mat-error>
+        <mat-error *ngIf="form.get('evidencia_cientifica')?.hasError('maxlength')">Máximo 2000 caracteres</mat-error>
+      </mat-form-field>
+    </div>
+
+    @if (form.invalid && form.touched) {
+      <p class="ef-form__summary" role="alert">
+        Hay errores en el formulario. Corrígelos antes de enviar.
+      </p>
+    }
+
+    <div class="ef-actions">
+      <button mat-stroked-button type="button" color="warn" (click)="cancelClick.emit()" class="ef-actions__cancel">
+        <mat-icon>close</mat-icon>
+        Descartar
+      </button>
+      <button mat-flat-button color="primary" type="submit" class="ef-actions__submit">
+        {{ isEdit ? 'Actualizar ejercicio' : 'Guardar y enviar a revisión' }}
+      </button>
+    </div>
+  </form>
+</div>

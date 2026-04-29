@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
+import { afterNextRender, Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,9 +10,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EjercicioService } from '../../services/ejercicio.service';
 import { EjercicioCardComponent } from '../../components/ejercicio-card/ejercicio-card.component';
 import { Ejercicio } from '../../models/ejercicio.model';
-import { AuthService } from '../../../../core/auth/auth.service';
 
-type FalloCarga = 'none' | 'auth' | 'other';
+type FalloCarga = 'none' | 'other';
 
 @Component({
   selector: 'app-biblioteca-ejercicios',
@@ -29,44 +28,37 @@ type FalloCarga = 'none' | 'auth' | 'other';
   templateUrl: './biblioteca-ejercicios.component.html',
   styleUrl: './biblioteca-ejercicios.component.scss',
 })
-export class BibliotecaEjerciciosPage implements OnInit {
+export class BibliotecaEjerciciosPage {
   private readonly ejercicioService = inject(EjercicioService);
-  private readonly auth = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
 
   loading = this.ejercicioService.loading;
 
   searchQuery = '';
-  /** Respuesta del API (solo publicados); la búsqueda filtra sobre esto, no sobre la señal global del servicio. */
   private readonly listaBiblioteca = signal<Ejercicio[]>([]);
   filteredEjercicios = signal<Ejercicio[]>([]);
   cargaFallida = signal<FalloCarga>('none');
 
   constructor() {
-    this.auth.sesionLista$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.cargar());
-  }
-
-  ngOnInit(): void {
-    void this.auth.asegurarTokenDemo().then(() => this.cargar());
+    afterNextRender(() => this.cargar());
   }
 
   private cargar(): void {
-    void this.auth.asegurarTokenDemo().then(() => {
-      this.ejercicioService.getEjercicios({ estado: 'PUBLICADO' }).subscribe({
+    this.ejercicioService
+      .getEjercicios({ estado: 'PUBLICADO' })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
         next: (data: Ejercicio[]) => {
           this.cargaFallida.set('none');
           this.listaBiblioteca.set(data);
           this.aplicarFiltroBusqueda();
         },
-        error: (err: HttpErrorResponse) => {
+        error: (_err: HttpErrorResponse) => {
           this.listaBiblioteca.set([]);
           this.filteredEjercicios.set([]);
-          this.cargaFallida.set(err.status === 401 || err.status === 403 ? 'auth' : 'other');
+          this.cargaFallida.set('other');
         },
       });
-    });
   }
 
   onSearch(): void {

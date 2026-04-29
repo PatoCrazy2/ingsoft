@@ -1,0 +1,39 @@
+<div class="bib-page">
+  <div class="bib-shell">
+    <nav class="bib-nav" aria-label="Secciones">
+      <a routerLink="/home" class="bib-nav__link">Inicio</a>
+      <span class="bib-nav__sep" aria-hidden="true"></span>
+      <a routerLink="/ejercicios" class="bib-nav__link">Biblioteca</a>
+      <span class="bib-nav__sep" aria-hidden="true"></span>
+      <a routerLink="/ejercicios/admin" class="bib-nav__link">Administración</a>
+      <span class="bib-nav__sep" aria-hidden="true"></span>
+      <span class="bib-nav__current">{{ isEdit ? 'Editar ejercicio' : 'Nuevo ejercicio' }}</span>
+      <div class="bib-nav__actions">
+        <a routerLink="/ejercicios" class="bib-nav__link bib-nav__link--pill">Ver biblioteca</a>
+      </div>
+    </nav>
+
+    <header class="bib-hero">
+      <p class="bib-hero__kicker">Catálogo clínico</p>
+      <h1 class="bib-hero__title">{{ isEdit ? 'Editar ejercicio' : 'Nuevo ejercicio' }}</h1>
+      <p class="bib-hero__subtitle" *ngIf="!isEdit">
+        Se enviará al flujo de <strong>pendiente de validación</strong> en el API cuando haya conexión. Si el API no
+        responde, el guardado queda en <strong>este navegador</strong> (localStorage) y verás el ejercicio en biblioteca
+        y administración al recargar.
+      </p>
+      <p class="bib-hero__subtitle" *ngIf="isEdit">
+        Ajusta la ficha y guarda. Los mismos criterios de conexión y copia local aplican si el API no está disponible.
+      </p>
+    </header>
+
+    <main class="bib-main">
+      <app-ejercicio-form
+        [initialData]="ejercicio"
+        [isEdit]="isEdit"
+        (formSubmit)="onSave($event)"
+        (cancelClick)="onCancel()"
+      >
+      </app-ejercicio-form>
+    </main>
+  </div>
+</div>

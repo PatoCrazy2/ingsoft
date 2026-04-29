@@ -14,28 +14,19 @@
       <p class="bib-hero__kicker">Catálogo clínico</p>
       <h1 class="bib-hero__title">Biblioteca de ejercicios</h1>
       <p class="bib-hero__subtitle">
-        Recursos publicados con criterios de seguridad y evidencia. La sesión demo del terapeuta se obtiene sola al
-        cargar la app si el API responde.
+        Datos reales del API cuando esté disponible; si no hay conexión, la app muestra un catálogo de demostración
+        para que puedas revisar el diseño.
       </p>
 
-      @if (cargaFallida() === 'auth') {
-        <div class="bib-banner bib-banner--auth" role="status">
-          <mat-icon aria-hidden="true">vpn_key</mat-icon>
-          <div>
-            <strong>Sesión requerida</strong>
-            <p>Para ver el catálogo real del servidor, entra con la cuenta demo del terapeuta.</p>
-            <a mat-stroked-button color="primary" routerLink="/home" class="bib-banner__btn">Ir al inicio</a>
-          </div>
-        </div>
-      } @else if (cargaFallida() === 'other') {
+      @if (cargaFallida() === 'other') {
         <div class="bib-banner bib-banner--warn" role="alert">
           <mat-icon aria-hidden="true">cloud_off</mat-icon>
           <div>
             <strong>No se pudo conectar al API</strong>
             <p>
-              Arranca el backend con Docker, confirma que el proxy apunte a
-              <code>http://localhost:8002</code> (archivo <code>proxy.conf.json</code>) y usa
-              <code>ng serve</code> (no abras solo el <code>index.html</code>).
+              Revisa Docker, el proxy (<code>proxy.conf.json</code> → <code>localhost:8002</code>) y
+              <code>ng serve</code>. Mientras tanto deberías ver igualmente ejercicios de ejemplo cargados desde el
+              cliente.
             </p>
           </div>
         </div>
@@ -44,7 +35,17 @@
       <div class="bib-search-wrap">
         <label class="bib-search__label" for="bibSearchInput">Buscar ejercicios o categorías</label>
         <div class="bib-search__box">
-          <mat-icon class="bib-search__glyph" aria-hidden="true">search</mat-icon>
+          <span class="bib-search__glyph" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+              <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
+              <path
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                d="M20 20 16.35 16.35"
+              />
+            </svg>
+          </span>
           <input
             id="bibSearchInput"
             class="bib-search__input"

@@ -192,10 +192,17 @@
 }
 
 .bib-search__glyph {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
   color: #94a3b8;
-  font-size: 1.35rem;
+}
+
+.bib-search__glyph svg {
   width: 1.35rem;
   height: 1.35rem;
+  display: block;
 }
 
 .bib-search__input {

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, catchError, of } from 'rxjs';
+import { MOCK_PACIENTES } from '../../../core/mock/clinical-mock.data';
 import { API_BASE_URL, withApiBase } from '../../../core/http/api-base-url';
 
 export interface PacienteListItem {
@@ -43,7 +44,12 @@ export class PacienteService {
   private readonly baseUrl = withApiBase(this.apiBase, '/api/pacientes');
 
   listar(): Observable<PacienteListItem[]> {
-    return this.http.get<PacienteListItem[]>(`${this.baseUrl}/`);
+    return this.http.get<PacienteListItem[]>(`${this.baseUrl}/`).pipe(
+      catchError(() => {
+        console.warn('[PacienteService] API no disponible; usando pacientes mock.');
+        return of(MOCK_PACIENTES);
+      }),
+    );
   }
 
   obtenerDetalle(pacienteId: string): Observable<PacienteDetalleDto> {

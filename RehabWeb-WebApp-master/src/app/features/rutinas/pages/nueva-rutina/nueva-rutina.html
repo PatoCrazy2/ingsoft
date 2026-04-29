@@ -11,26 +11,12 @@
       <p class="nr-hero__kicker">Flujo clínico</p>
       <h1 class="nr-hero__title">Nueva rutina</h1>
       <p class="nr-hero__subtitle">
-        Elige un paciente de tu cartera: el catálogo se reduce en el servidor según movilidad, territorio
-        ACV y evaluación registrada.
+        Elige un paciente: con API activo el filtro es clínico en servidor; sin API verás pacientes y ejercicios de
+        demostración.
       </p>
     </header>
 
-    @if (estado.requiereInicioSesion()) {
-      <section class="nr-auth" aria-labelledby="nr-auth-title">
-        <mat-icon class="nr-auth__icon" aria-hidden="true">lock_person</mat-icon>
-        <h2 id="nr-auth-title" class="nr-auth__title">Acceso de terapeuta</h2>
-        <p class="nr-auth__text">
-          El listado de pacientes está protegido. Inicia sesión con la cuenta demo del terapeuta (tras
-          <code>seed_demo</code> en el API).
-        </p>
-        <a mat-flat-button color="primary" routerLink="/home" class="nr-auth__btn">Ir al inicio</a>
-        <p class="nr-auth__hint">
-          <strong>Demo:</strong> terapeuta&#64;demo.rehab · demo12345
-        </p>
-      </section>
-    } @else {
-      <section class="nr-panel" aria-labelledby="nr-paciente-label">
+    <section class="nr-panel" aria-labelledby="nr-paciente-label">
         <div class="nr-panel__head">
           <h2 id="nr-paciente-label" class="nr-panel__title">Paciente</h2>
           <span class="nr-panel__chip">Pre-filtrado en servidor</span>
@@ -53,10 +39,9 @@
         } @else if (pacientes.length === 0) {
           <div class="nr-panel__empty">
             <mat-icon>group_off</mat-icon>
-            <p>No hay pacientes asignados a tu cuenta.</p>
+            <p>No hay pacientes en la lista.</p>
             <p class="nr-panel__empty-note">
-              Debes iniciar sesión como <strong>terapeuta&#64;demo.rehab</strong> (no como paciente) y ejecutar en el
-              backend <code>python manage.py seed_demo</code>.
+              Con el API en marcha deberían aparecer pacientes reales; si todo falla, revisa la consola del navegador.
             </p>
           </div>
         } @else {
@@ -77,7 +62,6 @@
           </mat-form-field>
         }
       </section>
-    }
 
     @if (estado.errorEjercicios()) {
       <div class="nr-alert" role="alert">
@@ -96,7 +80,7 @@
       </div>
     }
 
-    @if (!estado.cargandoEjercicios() && pacienteIdSeleccion && auth.isLoggedIn()) {
+    @if (!estado.cargandoEjercicios() && pacienteIdSeleccion) {
       <section class="nr-results" aria-labelledby="nr-results-title">
         <div class="nr-results__head">
           <h2 id="nr-results-title" class="nr-results__title">Ejercicios sugeridos</h2>

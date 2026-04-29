@@ -1,0 +1,100 @@
+/* Alineado con biblioteca-ejercicios (misma cromática y navegación). */
+.bib-page {
+  min-height: 100dvh;
+  background: linear-gradient(185deg, #eef2ff 0%, var(--bg-color) 22%, var(--bg-color) 100%);
+  padding: 1.25rem 1rem 3.5rem;
+}
+
+.bib-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.bib-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-bottom: 2rem;
+  font-size: 0.875rem;
+}
+
+.bib-nav__link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.bib-nav__link:hover {
+  text-decoration: underline;
+}
+
+.bib-nav__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.65rem;
+  margin-left: auto;
+}
+
+.bib-nav__link--pill {
+  padding: 0.4rem 0.95rem;
+  border-radius: 999px;
+  background: var(--rw-surface);
+  border: 1px solid #e2e8f0;
+  font-weight: 600;
+}
+
+.bib-nav__link--pill:hover {
+  text-decoration: none;
+  background: #f8fafc;
+}
+
+.bib-nav__sep {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #cbd5e1;
+}
+
+.bib-nav__current {
+  color: var(--rw-muted);
+  font-weight: 500;
+}
+
+.bib-hero {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.bib-hero__kicker {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6366f1;
+}
+
+.bib-hero__title {
+  margin: 0 0 0.65rem;
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: var(--rw-title);
+}
+
+.bib-hero__subtitle {
+  margin: 0 auto;
+  max-width: 38rem;
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: var(--rw-muted);
+  font-weight: 400;
+}
+
+.bib-main {
+  margin-top: 0.5rem;
+  padding-bottom: 2rem;
+}

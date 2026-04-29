@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   EjercicioService,
   mapDjangoEjercicioToEjercicio,
@@ -8,6 +8,29 @@ import {
 import { EjercicioFormComponent } from '../../components/ejercicio-form/ejercicio-form.component';
 import { Ejercicio, EjercicioFormData } from '../../models/ejercicio.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MOCK_EJERCICIO_NUEVO } from '../../../../core/mock/clinical-mock.data';
+import {
+  EjerciciosLocalesService,
+  ejercicioDesdeFormulario,
+} from '../../../../core/storage/ejercicios-locales.service';
+
+/** Igual que el payload al API: rellena vídeo y evidencia mínima para persistencia local homogénea. */
+function formularioEnriquecidoMockLocal(form: EjercicioFormData): EjercicioFormData {
+  const video =
+    (form.video_url ?? '').trim() || 'https://example.org/videos/ejercicio-demo-placeholder.mp4';
+  let ev = (form.evidencia_cientifica ?? '').trim();
+  if (ev.length < 20) {
+    ev = `${(form.descripcion ?? '').trim()} Contexto clínico mock para validador (sin API).`;
+  }
+  if (!form.video_url?.trim() && ev.length < 40) {
+    ev = `${ev} Referencias generales en rehabilitación (mock local).`;
+  }
+  return {
+    ...form,
+    video_url: video,
+    evidencia_cientifica: ev,
+  };
+}
 
 function payloadCrearCatalogo(form: EjercicioFormData): Record<string, unknown> {
   const video =
@@ -39,29 +62,16 @@ function payloadCrearCatalogo(form: EjercicioFormData): Record<string, unknown> 
 
 @Component({
   standalone: true,
-  imports: [CommonModule, EjercicioFormComponent],
-  template: `
-    <div class="container py-5">
-      <h1 class="mb-4">{{ isEdit ? 'Editar ejercicio' : 'Nuevo ejercicio' }}</h1>
-      <p class="text-secondary mb-4" *ngIf="!isEdit">
-        Se enviará al flujo de <strong>pendiente de validación</strong> (no se publica hasta las validaciones por
-        pares en el API).
-      </p>
-      <app-ejercicio-form
-        [initialData]="ejercicio"
-        [isEdit]="isEdit"
-        (formSubmit)="onSave($event)"
-        (cancelClick)="onCancel()"
-      >
-      </app-ejercicio-form>
-    </div>
-  `,
+  imports: [CommonModule, RouterLink, EjercicioFormComponent],
+  templateUrl: './ejercicio-edit.component.html',
+  styleUrl: './ejercicio-edit.component.scss',
 })
 export class EjercicioEditPage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private service = inject(EjercicioService);
   private snack = inject(MatSnackBar);
+  private locales = inject(EjerciciosLocalesService);
 
   ejercicio?: Ejercicio;
   isEdit = false;
@@ -76,38 +86,57 @@ export class EjercicioEditPage implements OnInit {
         },
         error: () => this.snack.open('No se pudo cargar el ejercicio', 'Cerrar', { duration: 4000 }),
       });
+    } else {
+      this.ejercicio = { ...MOCK_EJERCICIO_NUEVO };
     }
   }
 
   onSave(data: EjercicioFormData): void {
     if (this.isEdit && this.ejercicio) {
       this.service.updateEjercicio(this.ejercicio.id, data).subscribe({
-        next: () => {
-          this.snack.open('Ejercicio actualizado', 'Cerrar', { duration: 3000 });
+        next: (res) => {
+          const guardado = mapDjangoEjercicioToEjercicio(res as unknown as Record<string, unknown>);
+          this.locales.guardar(guardado);
+          this.snack.open('Ejercicio actualizado (también copia en este navegador)', 'Cerrar', { duration: 3500 });
           this.service.getEjercicios().subscribe({
             next: () => void this.router.navigate(['/ejercicios/admin']),
             error: () => void this.router.navigate(['/ejercicios/admin']),
           });
         },
-        error: (err) => {
-          const msg = err?.error ? JSON.stringify(err.error).slice(0, 120) : 'Error al guardar';
-          this.snack.open(msg, 'Cerrar', { duration: 5000 });
+        error: (_err) => {
+          const local = ejercicioDesdeFormulario(
+            data,
+            this.ejercicio!.id,
+            this.ejercicio!.estado ?? 'PENDIENTE_VALIDACION',
+            this.ejercicio,
+          );
+          this.locales.guardar(local);
+          this.snack.open(
+            'Sin API: cambios guardados solo en este navegador. Revisa biblioteca o admin tras recargar.',
+            'Cerrar',
+            { duration: 6000 },
+          );
+          void this.router.navigate(['/ejercicios/admin']);
         },
       });
       return;
     }
     this.service.crearEjercicioCatalogo(payloadCrearCatalogo(data)).subscribe({
-      next: () => {
-        this.snack.open('Ejercicio enviado a revisión', 'Cerrar', { duration: 3000 });
+      next: (res) => {
+        const guardado = mapDjangoEjercicioToEjercicio(res as unknown as Record<string, unknown>);
+        this.locales.guardar(guardado);
+        this.snack.open('Ejercicio enviado al API y copiado en este navegador', 'Cerrar', { duration: 3500 });
         this.service.getEjercicios().subscribe({
           next: () => void this.router.navigate(['/ejercicios/admin']),
           error: () => void this.router.navigate(['/ejercicios/admin']),
         });
       },
-      error: (err) => {
-        const body = err?.error;
-        const det = typeof body === 'object' && body ? JSON.stringify(body) : String(err?.message ?? '');
-        this.snack.open(det.slice(0, 200) || 'Error al crear', 'Cerrar', { duration: 6000 });
+      error: () => {
+        const id = this.locales.nuevoIdLocal();
+        const datos = formularioEnriquecidoMockLocal(data);
+        const local = ejercicioDesdeFormulario(datos, id, 'PENDIENTE_VALIDACION');
+        this.locales.guardar(local);
+        void this.router.navigate(['/ejercicios/admin']);
       },
     });
   }
