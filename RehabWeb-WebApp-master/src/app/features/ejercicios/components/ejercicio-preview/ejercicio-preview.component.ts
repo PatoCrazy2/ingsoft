@@ -1,15 +1,16 @@
 import { Component, Input, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatButtonModule } from '@angular/material/button';
 import { Ejercicio } from '../../models/ejercicio.model';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
+/**
+ * Vista premium de ficha (detalle / validación).
+ */
 @Component({
   selector: 'app-ejercicio-preview',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatDividerModule, MatChipsModule, MatButtonModule],
+  imports: [CommonModule, MatIconModule, MatButtonModule],
   template: `
     <div class="preview-container animate-in" *ngIf="ejercicio">
       <div class="media-section">
@@ -137,14 +138,6 @@ import { Ejercicio } from '../../models/ejercicio.model';
       transition: transform var(--duration-base) var(--easing-default);
       mat-icon { font-size: 40px; width: 40px; height: 40px; color: var(--color-primary); }
       &:hover { transform: scale(1.1); }
-      &:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }
-    }
-
-    .overlay-controls {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 10;
     }
 
     .detail-content {
@@ -270,7 +263,8 @@ import { Ejercicio } from '../../models/ejercicio.model';
   `]
 })
 export class EjercicioPreviewComponent {
-  private location = inject(Location);
+  private readonly location = inject(Location);
+
   @Input({ required: true }) ejercicio!: Ejercicio;
 
   goBack(): void {

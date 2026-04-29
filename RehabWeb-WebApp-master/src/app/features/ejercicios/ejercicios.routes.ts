@@ -11,6 +11,11 @@ export const EJERCICIOS_ROUTES: Routes = [
     component: BibliotecaEjerciciosPage,
     // canActivate: [RoleGuard], data: { roles: ['Terapeuta', 'Admin'] }
   },
+  /** Detalle desde biblioteca / nueva rutina (antes el enlace apuntaba a una ruta inexistente). */
+  {
+    path: ':id/detalle',
+    component: EjercicioDetailPage,
+  },
   {
     path: 'admin',
     children: [

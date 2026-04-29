@@ -50,7 +50,7 @@ import { Ejercicio } from '../../models/ejercicio.model';
       </mat-card-content>
 
       <mat-card-actions class="ex-card__actions">
-        <a mat-button color="primary" class="ex-card__cta" [routerLink]="['/ejercicios', ejercicio.id, 'preview']">
+        <a mat-button color="primary" class="ex-card__cta" [routerLink]="['/ejercicios', ejercicio.id, 'detalle']">
           Detalles
         </a>
       </mat-card-actions>

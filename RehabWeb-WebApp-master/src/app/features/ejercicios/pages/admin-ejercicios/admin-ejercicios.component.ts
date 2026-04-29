@@ -1,29 +1,24 @@
-import { Component, DestroyRef, OnInit, inject, signal, computed, effect } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, OnInit, inject, signal, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RouterLink } from '@angular/router';
-import { AuthService } from '../../../../core/auth/auth.service';
 import { EjercicioService } from '../../services/ejercicio.service';
 import { Ejercicio } from '../../models/ejercicio.model';
 import { FormsModule } from '@angular/forms';
-
 
 @Component({
   selector: 'app-admin-ejercicios',
   standalone: true,
   imports: [
-    CommonModule, 
-    MatTableModule, 
-    MatButtonModule, 
-    MatIconModule, 
-    MatChipsModule, 
+    CommonModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
     MatTooltipModule,
     RouterLink,
     FormsModule
@@ -100,7 +95,7 @@ import { FormsModule } from '@angular/forms';
                      [class.badge--published]="e.estado === 'PUBLICADO'"
                      [class.badge--pending]="e.estado === 'PENDIENTE_VALIDACION'"
                      [class.badge--draft]="e.estado === 'BORRADOR'">
-                  {{ e.estado.replace('_', ' ') }}
+                  {{ e.estado?.replace('_', ' ') || 'S/E' }}
                 </div>
               </td>
             </ng-container>
@@ -269,65 +264,28 @@ import { FormsModule } from '@angular/forms';
       border-radius: var(--radius-md) !important;
     }
 
-    /* ── ALTURA BASE UNIFORME para todos los controles ── */
     $control-height: 40px;
 
-    /* ── INPUT ESTÁNDAR ── */
-    .field__input,
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    input[type="number"],
-    input[type="search"],
-    input[type="url"],
-    textarea.field__textarea {
+    input[type="search"] {
       display: block;
       width: 100%;
-      height: $control-height;          /* altura fija — elimina desbordes */
-      padding: 0 var(--space-3);        /* padding horizontal, sin vertical */
+      height: $control-height;
+      padding: 0 var(--space-3);
       font-family: var(--font-family);
       font-size: var(--text-s);
-      font-weight: var(--font-regular);
       color: var(--color-text-primary);
       background: var(--color-bg-card);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-sm);
       outline: none;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;          /* placeholder/texto largo no desborda */
-      transition: border-color var(--duration-base) var(--easing-default),
-                  box-shadow var(--duration-base) var(--easing-default);
-
-      &::placeholder {
-        color: var(--color-text-muted);
-        font-size: var(--text-s);
-        line-height: $control-height;   /* centra el placeholder verticalmente */
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
+      transition: all var(--duration-base);
 
       &:focus {
         border-color: var(--color-primary);
         box-shadow: 0 0 0 3px rgba(0, 167, 129, 0.15);
-        outline: none;
       }
-
-      &:disabled {
-        color: var(--color-text-muted);
-        cursor: not-allowed;
-        border-color: var(--color-border);
-      }
-
-      &::-webkit-search-decoration,
-      &::-webkit-search-cancel-button,
-      &::-webkit-search-results-button,
-      &::-webkit-search-results-decoration { display: none; }
     }
 
-    /* ── SELECT ── */
-    select,
     .field__select {
       display: block;
       width: 100%;
@@ -335,8 +293,6 @@ import { FormsModule } from '@angular/forms';
       padding: 0 var(--space-6) 0 var(--space-3);
       font-family: var(--font-family);
       font-size: var(--text-s);
-      font-weight: var(--font-regular);
-      color: var(--color-text-primary);
       background-color: var(--color-bg-card);
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23707E8C' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
       background-repeat: no-repeat;
@@ -344,21 +300,11 @@ import { FormsModule } from '@angular/forms';
       background-size: 14px;
       border: 1px solid var(--color-border);
       border-radius: var(--radius-sm);
+      appearance: none;
       outline: none;
       cursor: pointer;
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      transition: border-color var(--duration-base) var(--easing-default),
-                  box-shadow var(--duration-base) var(--easing-default);
-
-      &:focus {
-        border-color: var(--color-primary);
-        box-shadow: 0 0 0 3px rgba(0, 167, 129, 0.15);
-      }
     }
 
-    /* ── BARRA DE BÚSQUEDA CON ÍCONO ── */
     .search-bar {
       position: relative;
       display: flex;
@@ -374,37 +320,18 @@ import { FormsModule } from '@angular/forms';
         height: 18px;
         color: var(--color-text-muted);
         pointer-events: none;
-        flex-shrink: 0;
         z-index: 1;
       }
 
       input {
-        height: $control-height;
         padding-left: calc(var(--space-3) + 18px + var(--space-2));
-        padding-right: var(--space-3);
         border-radius: var(--radius-pill);
-        border: 1px solid var(--color-border);
-        background: var(--color-bg-card);
-        font-family: var(--font-family);
-        font-size: var(--text-s);
-        color: var(--color-text-primary);
-        width: 100%;
-        outline: none;
-        transition: border-color var(--duration-base) var(--easing-default),
-                    box-shadow var(--duration-base) var(--easing-default);
-
-        &::placeholder { color: var(--color-text-muted); font-size: var(--text-s); }
-        &:focus {
-          border-color: var(--color-primary);
-          box-shadow: 0 0 0 3px rgba(0, 167, 129, 0.15);
-        }
       }
     }
   `]
 })
 export class AdminEjerciciosPage implements OnInit {
   private readonly ejercicioService = inject(EjercicioService);
-  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -429,7 +356,7 @@ export class AdminEjerciciosPage implements OnInit {
   displayedColumns: string[] = ['nombre', 'estado', 'dificultad', 'acciones'];
 
   ngOnInit(): void {
-    this.recargar();
+    afterNextRender(() => this.recargar());
     
     this.router.events
       .pipe(
@@ -445,8 +372,6 @@ export class AdminEjerciciosPage implements OnInit {
   }
 
   private recargar(): void {
-    void this.auth.asegurarTokenDemo().then(() => {
-      this.ejercicioService.getEjercicios().subscribe();
-    });
+    this.ejercicioService.getEjercicios().subscribe();
   }
 }
