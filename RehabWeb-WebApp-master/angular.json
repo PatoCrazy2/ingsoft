@@ -87,6 +87,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "RehabWeb-WebApp:build:production"
@@ -95,8 +98,7 @@
               "buildTarget": "RehabWeb-WebApp:build:development"
             }
           },
-          "defaultConfiguration": "development",
-          "proxyConfig": "proxy.conf.json"
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n"
