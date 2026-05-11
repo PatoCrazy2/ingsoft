@@ -4,6 +4,7 @@ import { Observable, catchError, finalize, map, of, tap, throwError } from 'rxjs
 import { API_BASE_URL, withApiBase } from '../../../core/http/api-base-url';
 import { EjerciciosLocalesService } from '../../../core/storage/ejercicios-locales.service';
 import { Ejercicio, EjercicioFormData, EstadoPublicacion } from '../models/ejercicio.model';
+import { PacienteDetalleDto } from '../../rutinas/services/paciente';
 
 /** Adapta la respuesta del modelo Django al shape usado por las tarjetas de la app. */
 export function mapDjangoEjercicioToEjercicio(api: Record<string, unknown>): Ejercicio {
@@ -99,6 +100,54 @@ export class EjercicioService {
         return throwError(() => err);
       })
     );
+  }
+
+  /**
+   * Cerebro Clínico: Cruza el perfil del paciente con el catálogo de ejercicios.
+   * Devuelve los ejercicios ordenados por relevancia clínica.
+   */
+  getRecomendacionesClinicas(paciente: PacienteDetalleDto, catalogo: Ejercicio[]): (Ejercicio & { puntuacion: number, recomendaciones: string[] })[] {
+    const perfil = paciente.perfil_clinico;
+    if (!perfil) return catalogo.map(e => ({ ...e, puntuacion: 0, recomendaciones: [] }));
+
+    const diagnostico = (perfil.diagnostico_principal || '').toLowerCase();
+    const restricciones = (perfil.restricciones || '').toLowerCase();
+
+    return catalogo.map(ejercicio => {
+      let puntuacion = 0;
+      const recomendaciónTags: string[] = [];
+      const categoria = (ejercicio.categoria || '').toLowerCase();
+      const desc = (ejercicio.descripcion || '').toLowerCase();
+
+      // Lógica de Matching por Palabras Clave
+      const keywords: Record<string, string[]> = {
+        'rodilla': ['rodilla', 'lca', 'menisco', 'fémur', 'tibia'],
+        'hombro': ['hombro', 'manguito', 'supraespinoso', 'acromion'],
+        'espalda': ['espalda', 'lumbar', 'cervical', 'disco', 'hernia', 'columna'],
+        'fuerza': ['fortalecimiento', 'fuerza', 'hipertrofia', 'carga'],
+        'movilidad': ['estiramiento', 'rango', 'rom', 'movilidad', 'flexibilidad']
+      };
+
+      Object.entries(keywords).forEach(([key, terms]) => {
+        if (diagnostico.includes(key) || terms.some(t => diagnostico.includes(t))) {
+          if (categoria.includes(key) || terms.some(t => desc.includes(t))) {
+            puntuacion += 10;
+            recomendaciónTags.push(`Ideal para ${key}`);
+          }
+        }
+      });
+
+      // Penalización por restricciones
+      const palabrasPeligrosas = restricciones.split(',').map((s: string) => s.trim().toLowerCase());
+      palabrasPeligrosas.forEach((p: string) => {
+        if (p && (desc.includes(p) || categoria.includes(p))) {
+          puntuacion -= 20;
+          recomendaciónTags.push(`⚠️ Contraindicado: ${p}`);
+        }
+      });
+
+      return { ...ejercicio, puntuacion, recomendaciones: recomendaciónTags };
+    }).sort((a, b) => b.puntuacion - a.puntuacion);
   }
 
   getEjercicio(id: string): Observable<Ejercicio> {

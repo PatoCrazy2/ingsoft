@@ -83,31 +83,37 @@ export class NuevaRutinaPage {
     if (!id) {
       this.estado.pacienteSeleccionado.set(null);
       this.estado.ejerciciosPrefiltrados.set([]);
+      this.estado.recomendacionesClinicas.set([]);
       return;
     }
-    const p = this.pacientes.find((x) => x.paciente_id === id) ?? null;
-    this.estado.pacienteSeleccionado.set(p);
+
     this.estado.cargandoEjercicios.set(true);
     this.estado.errorEjercicios.set(null);
-    this.ejerciciosApi.getEjerciciosPrefiltradosPorPaciente(id).subscribe({
-      next: (ej) => {
-        this.estado.ejerciciosPrefiltrados.set(ej);
-        this.estado.cargandoEjercicios.set(false);
-        this.estado.errorEjercicios.set(null);
+
+    // 1. Obtener detalle completo del paciente
+    this.pacientesApi.obtenerDetalle(id).subscribe({
+      next: (paciente) => {
+        this.estado.pacienteSeleccionado.set(paciente);
+        
+        // 2. Obtener ejercicios pre-filtrados por el backend
+        this.ejerciciosApi.getEjerciciosPrefiltradosPorPaciente(id).subscribe({
+          next: (ejercicios) => {
+            // 3. Aplicar Cerebro Clínico (Frontend) para el matching avanzado
+            const sugeridos = this.ejerciciosApi.getRecomendacionesClinicas(paciente, ejercicios);
+            this.estado.recomendacionesClinicas.set(sugeridos);
+            this.estado.ejerciciosPrefiltrados.set(ejercicios);
+            this.estado.cargandoEjercicios.set(false);
+          },
+          error: () => {
+            this.estado.cargandoEjercicios.set(false);
+            this.estado.errorEjercicios.set('Error al cargar catálogo de ejercicios.');
+          }
+        });
       },
-      error: (err: HttpErrorResponse) => {
+      error: () => {
         this.estado.cargandoEjercicios.set(false);
-        this.estado.ejerciciosPrefiltrados.set([]);
-        const body = err.error;
-        let msg = 'No se pudieron cargar ejercicios para este paciente.';
-        if (body?.paciente) {
-          const v = body.paciente;
-          msg = Array.isArray(v) ? v[0] : String(v);
-        } else if (body?.detail) {
-          msg = String(body.detail);
-        }
-        this.estado.errorEjercicios.set(msg);
-      },
+        this.estado.errorEjercicios.set('Error al obtener perfil clínico del paciente.');
+      }
     });
   }
 }

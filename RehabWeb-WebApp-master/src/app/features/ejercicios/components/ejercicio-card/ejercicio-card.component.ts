@@ -30,12 +30,12 @@ import { Ejercicio } from '../../models/ejercicio.model';
 
         <div class="ex-card__chips">
           <div class="ex-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chip-icon"><path d="M20.42 4.58a10 10 0 1 1-14.42 0"></path><polyline points="12 2 12 12"></polyline></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.42 4.58a10 10 0 1 1-14.42 0"></path><polyline points="12 2 12 12"></polyline></svg>
             <span class="ex-chip__num">{{ ejercicio.series ?? 3 }}</span>
             <span class="ex-chip__lbl">series</span>
           </div>
           <div class="ex-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chip-icon"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
             <span class="ex-chip__num">{{ ejercicio.reps || '12-15' }}</span>
             <span class="ex-chip__lbl">reps</span>
           </div>
@@ -45,7 +45,7 @@ import { Ejercicio } from '../../models/ejercicio.model';
       <div class="ex-card__footer">
         <a [routerLink]="['/ejercicios', ejercicio.id, 'detalle']" class="btn-card-premium">
           Ver Detalles
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="btn-icon"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
         </a>
       </div>
     </mat-card>
