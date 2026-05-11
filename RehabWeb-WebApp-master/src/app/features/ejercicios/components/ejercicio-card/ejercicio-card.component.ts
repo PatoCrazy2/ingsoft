@@ -61,24 +61,25 @@ import { Ejercicio } from '../../models/ejercicio.model';
       height: 100%;
       display: flex;
       flex-direction: column;
-      border-radius: 18px !important;
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      border: 1px solid var(--rw-border) !important;
-      background: var(--rw-surface) !important;
-      box-shadow: var(--card-shadow) !important;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-card);
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--duration-base) var(--easing-default), 
+                  box-shadow var(--duration-base) var(--easing-default);
 
-    .ex-card:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--premium-shadow) !important;
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
     }
 
     .ex-card__media {
       position: relative;
       height: 192px;
       overflow: hidden;
-      background: #e2e8f0;
+      background: var(--color-border);
     }
 
     .ex-card__img {
@@ -90,45 +91,45 @@ import { Ejercicio } from '../../models/ejercicio.model';
 
     .ex-card__badge {
       position: absolute;
-      top: 14px;
-      left: 14px;
-      padding: 6px 14px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
+      top: var(--space-3);
+      left: var(--space-3);
+      padding: var(--space-1) var(--space-3);
+      font-size: var(--text-xs);
+      font-weight: var(--font-bold);
+      letter-spacing: var(--tracking-wide);
       text-transform: uppercase;
-      color: #1d4ed8;
-      background: rgba(255, 255, 255, 0.94);
-      border-radius: 999px;
-      box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+      color: var(--color-primary);
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-pill);
+      box-shadow: var(--shadow-sm);
     }
 
     .ex-card__body {
       flex: 1;
-      padding: 1.1rem 1.15rem 0.5rem !important;
+      padding: var(--space-4) var(--space-4) var(--space-2);
     }
 
     .ex-card__title {
-      margin: 0 0 0.35rem;
-      font-size: 1.08rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: #0f172a;
-      line-height: 1.3;
+      margin: 0 0 var(--space-1);
+      font-size: var(--text-m);
+      font-weight: var(--font-bold);
+      letter-spacing: var(--tracking-normal);
+      color: var(--color-text-primary);
+      line-height: var(--leading-tight);
     }
 
     .ex-card__author {
-      margin: 0 0 0.45rem;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #64748b;
+      margin: 0 0 var(--space-2);
+      font-size: var(--text-xs);
+      font-weight: var(--font-medium);
+      color: var(--color-text-secondary);
     }
 
     .ex-card__desc {
       margin: 0;
-      color: var(--rw-muted);
-      font-size: 0.875rem;
-      line-height: 1.5;
+      color: var(--color-text-muted);
+      font-size: var(--text-s);
+      line-height: var(--leading-default);
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
@@ -139,42 +140,48 @@ import { Ejercicio } from '../../models/ejercicio.model';
     .ex-card__chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 1rem;
+      gap: var(--space-2);
+      margin-top: var(--space-3);
     }
 
     .ex-chip {
       display: inline-flex;
       align-items: baseline;
-      gap: 0.25rem;
-      padding: 0.35rem 0.75rem;
-      border-radius: 999px;
-      border: 1px solid var(--rw-border);
-      background: #f8fafc;
-      font-size: 0.78rem;
+      gap: var(--space-1);
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-app);
+      font-size: var(--text-xs);
     }
 
     .ex-chip__num {
-      font-weight: 700;
-      color: var(--rw-title);
+      font-weight: var(--font-bold);
+      color: var(--color-text-primary);
     }
 
     .ex-chip__lbl {
-      color: var(--rw-muted);
-      font-weight: 500;
+      color: var(--color-text-muted);
+      font-weight: var(--font-medium);
     }
 
     .ex-card__actions {
-      margin: 0 !important;
-      padding: 0.35rem 0.75rem 1rem !important;
+      margin: 0;
+      padding: var(--space-2) var(--space-3) var(--space-4);
       justify-content: flex-end;
     }
 
     .ex-card__cta {
-      font-weight: 700 !important;
-      letter-spacing: 0.06em;
-      font-size: 0.72rem !important;
-      text-transform: uppercase !important;
+      font-weight: var(--font-bold);
+      letter-spacing: var(--tracking-wide);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      transition: color var(--duration-base) var(--easing-default);
+
+      &:focus-visible {
+        outline: 2px solid var(--color-focus-ring);
+        outline-offset: 2px;
+      }
     }
   `,
 })

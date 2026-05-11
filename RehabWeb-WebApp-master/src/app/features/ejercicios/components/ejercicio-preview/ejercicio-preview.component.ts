@@ -1,158 +1,276 @@
 import { Component, Input, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatButtonModule } from '@angular/material/button';
 import { Ejercicio } from '../../models/ejercicio.model';
 
-/**
- * Vista mínima de ficha (detalle / validación). El diseño final lo definirá otro equipo.
- */
 @Component({
   selector: 'app-ejercicio-preview',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatIconModule, MatDividerModule, MatChipsModule, MatButtonModule],
   template: `
-    @if (ejercicio) {
-      <article class="ej-preview">
-        <p class="ej-preview__back">
-          <button type="button" class="ej-preview__back-btn" (click)="goBack()">Volver</button>
-        </p>
+    <div class="preview-container animate-in" *ngIf="ejercicio">
+      <div class="media-section">
+        <div class="overlay-controls p-4">
+           <button mat-mini-fab color="white" class="back-btn" (click)="goBack()">
+             <mat-icon>arrow_back</mat-icon>
+           </button>
+        </div>
+        
+        <ng-container *ngIf="ejercicio.video_url; else imageSection">
+           <div class="video-placeholder d-flex align-items-center justify-content-center">
+              <div class="play-btn">
+                <mat-icon>play_arrow</mat-icon>
+              </div>
+              <p class="ms-3 text-white fw-bold mb-0">REPRODUCIR VIDEO INSTRUCTIVO</p>
+           </div>
+        </ng-container>
+        <ng-template #imageSection>
+          <div class="hero-image" [style.backgroundImage]="'url(' + (ejercicio.imagen_url || 'assets/placeholder-exercise.jpg') + ')'"></div>
+        </ng-template>
+      </div>
 
-        <header class="ej-preview__head">
-          <h1 class="ej-preview__title">{{ ejercicio.nombre }}</h1>
-          <p class="ej-preview__meta">
-            {{ ejercicio.categoria || '—' }} · {{ ejercicio.dificultad || '—' }}
-            @if (ejercicio.estado) {
-              <span> · {{ ejercicio.estado }}</span>
-            }
-          </p>
-        </header>
+      <div class="detail-content p-5">
+        <div class="header-row d-flex justify-content-between align-items-start mb-4">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge-premium">{{ ejercicio.categoria }}</span>
+              <span class="difficulty-indicator" [ngClass]="(ejercicio.dificultad ?? 'FACIL').toLowerCase()"></span>
+              <span class="small text-secondary fw-bold">{{ ejercicio.dificultad }}</span>
+            </div>
+            <h1 class="display-title">{{ ejercicio.nombre }}</h1>
+          </div>
+          <div class="score-pill">
+            <mat-icon color="warn">star</mat-icon>
+            <span>{{ ejercicio.puntuacion_media || '5.0' }}</span>
+          </div>
+        </div>
 
-        <section class="ej-preview__block">
-          <h2 class="ej-preview__h2">Descripción</h2>
-          <p class="ej-preview__p">{{ ejercicio.descripcion || '—' }}</p>
-        </section>
+        <div class="row g-5">
+          <div class="col-lg-8">
+            <section class="mb-5">
+              <h3 class="detail-title">Sobre este ejercicio</h3>
+              <p class="lead-text">{{ ejercicio.descripcion }}</p>
+            </section>
 
-        <section class="ej-preview__block">
-          <h2 class="ej-preview__h2">Instrucciones</h2>
-          <pre class="ej-preview__pre">{{ ejercicio.instrucciones || '—' }}</pre>
-        </section>
+            <section class="mb-5">
+              <h3 class="detail-title">Instrucciones de ejecución</h3>
+              <div class="steps-container">
+                <div class="instruction-text">
+                  {{ ejercicio.instrucciones }}
+                </div>
+              </div>
+            </section>
+          </div>
 
-        <section class="ej-preview__block">
-          <h2 class="ej-preview__h2">Material</h2>
-          <p class="ej-preview__p">{{ ejercicio.material_necesario || '—' }}</p>
-        </section>
+          <div class="col-lg-4">
+            <div class="info-sidebar sticky-top" style="top: 2rem;">
+              <div class="info-card">
+                <h4 class="info-card-title">
+                  <mat-icon class="me-2 text-primary">fitness_center</mat-icon> Equipamiento
+                </h4>
+                <p class="info-card-text">{{ ejercicio.material_necesario || 'Sin equipamiento especial' }}</p>
+              </div>
 
-        @if (ejercicio.evidencia_cientifica?.trim()) {
-          <section class="ej-preview__block">
-            <h2 class="ej-preview__h2">Evidencia</h2>
-            <p class="ej-preview__p">{{ ejercicio.evidencia_cientifica }}</p>
-          </section>
-        }
-
-        @if (ejercicio.video_url?.trim() || ejercicio.imagen_url?.trim()) {
-          <section class="ej-preview__block">
-            <h2 class="ej-preview__h2">Enlaces</h2>
-            <ul class="ej-preview__list">
-              @if (ejercicio.video_url?.trim()) {
-                <li>
-                  <a [href]="ejercicio.video_url" target="_blank" rel="noopener noreferrer">Vídeo</a>
-                </li>
+              @if (ejercicio.evidencia_cientifica) {
+                <div class="info-card science-card">
+                  <h4 class="info-card-title science-title">
+                    <mat-icon class="me-2">verified</mat-icon> Base Científica
+                  </h4>
+                  <p class="info-card-text science-text">{{ ejercicio.evidencia_cientifica }}</p>
+                </div>
               }
-              @if (ejercicio.imagen_url?.trim()) {
-                <li>
-                  <a [href]="ejercicio.imagen_url" target="_blank" rel="noopener noreferrer">Imagen</a>
-                </li>
-              }
-            </ul>
-          </section>
-        }
-      </article>
-    }
+
+              <div class="mt-4 p-3 d-flex align-items-center border-box">
+                <div class="avatar me-3">J</div>
+                <div>
+                  <div class="fw-bold small">Revisado por</div>
+                  <div class="text-secondary smaller">Especialista en Rehabilitación</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   `,
-  styles: [
-    `
-      .ej-preview {
-        max-width: 42rem;
-        margin: 0 auto;
-        padding: 1rem 0 2rem;
-      }
+  styles: [`
+    .preview-container {
+      max-width: 1100px;
+      margin: var(--space-5) auto var(--space-8);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
 
-      .ej-preview__back {
-        margin: 0 0 1rem;
-      }
+    .media-section {
+      height: 450px;
+      position: relative;
+      background: var(--color-text-primary);
+    }
 
-      .ej-preview__back-btn {
-        font: inherit;
-        padding: 0;
-        border: none;
-        background: none;
-        color: var(--primary-color, #1d4ed8);
-        text-decoration: underline;
-        cursor: pointer;
-      }
+    .hero-image {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.8);
+    }
 
-      .ej-preview__back-btn:hover {
-        color: var(--primary-hover, #1e40af);
-      }
+    .video-placeholder {
+      height: 100%;
+      background: linear-gradient(45deg, var(--color-text-primary), var(--color-text-secondary));
+    }
 
-      .ej-preview__head {
-        margin-bottom: 1.5rem;
-      }
+    .play-btn {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: var(--radius-pill);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform var(--duration-base) var(--easing-default);
+      mat-icon { font-size: 40px; width: 40px; height: 40px; color: var(--color-primary); }
+      &:hover { transform: scale(1.1); }
+      &:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }
+    }
 
-      .ej-preview__title {
-        margin: 0 0 0.35rem;
-        font-size: 1.35rem;
-        font-weight: 600;
-        line-height: 1.25;
-        color: var(--rw-title, #0f172a);
-      }
+    .overlay-controls {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 10;
+    }
 
-      .ej-preview__meta {
-        margin: 0;
-        font-size: 0.875rem;
-        color: var(--rw-muted, #64748b);
-      }
+    .detail-content {
+      padding: var(--space-7);
+    }
 
-      .ej-preview__block {
-        margin-bottom: 1.25rem;
-      }
+    .display-title {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      color: var(--color-text-primary);
+      margin-bottom: 0;
+      line-height: var(--leading-tight);
+    }
 
-      .ej-preview__h2 {
-        margin: 0 0 0.35rem;
-        font-size: 0.8125rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        color: var(--rw-muted, #64748b);
-      }
+    .detail-title {
+      font-size: var(--text-l);
+      font-weight: var(--font-bold);
+      margin-bottom: var(--space-4);
+      color: var(--color-text-primary);
+    }
 
-      .ej-preview__p {
-        margin: 0;
-        font-size: 0.9375rem;
-        line-height: 1.5;
-        color: var(--rw-title, #0f172a);
-      }
+    .lead-text {
+      font-size: var(--text-m);
+      line-height: var(--leading-default);
+      color: var(--color-text-secondary);
+    }
 
-      .ej-preview__pre {
-        margin: 0;
-        font-family: inherit;
-        font-size: 0.9375rem;
-        line-height: 1.5;
-        white-space: pre-wrap;
-        word-break: break-word;
-        color: var(--rw-title, #0f172a);
-      }
+    .badge-premium {
+      background: var(--color-primary-low);
+      color: var(--color-primary);
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-md);
+      font-size: var(--text-xs);
+      font-weight: var(--font-bold);
+      text-transform: uppercase;
+    }
 
-      .ej-preview__list {
-        margin: 0;
-        padding-left: 1.25rem;
-        font-size: 0.9375rem;
-      }
-    `,
-  ],
+    .difficulty-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: var(--radius-pill);
+      &.facil { background: var(--color-primary); }
+      &.intermedio { background: var(--color-warning); }
+      &.dificil { background: var(--color-danger); }
+    }
+
+    .score-pill {
+      background: #fffbeb;
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-pill);
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-weight: var(--font-bold);
+      border: 1px solid var(--color-warning);
+    }
+
+    .instruction-text {
+      white-space: pre-wrap;
+      line-height: var(--leading-loose);
+      font-size: var(--text-m);
+      background: var(--color-bg-app);
+      border-left: 4px solid var(--color-primary);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+    }
+
+    .info-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+
+    .info-card-title {
+      font-size: var(--text-m);
+      font-weight: var(--font-bold);
+      margin-bottom: var(--space-3);
+      display: flex;
+      align-items: center;
+    }
+
+    .info-card-text {
+      font-size: var(--text-s);
+      color: var(--color-text-secondary);
+      margin-bottom: 0;
+    }
+
+    .science-card {
+      background: var(--color-primary-low);
+      border-color: var(--color-primary);
+    }
+
+    .science-title {
+      color: var(--color-primary);
+    }
+
+    .border-box {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-bg-card);
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--color-primary);
+      color: white;
+      border-radius: var(--radius-pill);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: var(--font-bold);
+    }
+
+    .smaller { font-size: var(--text-xs); }
+
+    @media (max-width: 992px) {
+      .detail-content { padding: var(--space-5); }
+      .media-section { height: 300px; }
+    }
+  `]
 })
 export class EjercicioPreviewComponent {
-  private readonly location = inject(Location);
-
+  private location = inject(Location);
   @Input({ required: true }) ejercicio!: Ejercicio;
 
   goBack(): void {

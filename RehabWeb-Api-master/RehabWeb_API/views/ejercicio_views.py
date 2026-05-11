@@ -42,6 +42,8 @@ class EjercicioViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         # Permisos granulares por acción
+        if self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]
         if self.action == 'create':
             return [permissions.IsAuthenticated(), IsTerapeutaOrAdmin()]
         if self.action in ['update', 'partial_update']:
@@ -99,7 +101,10 @@ class EjercicioViewSet(viewsets.ModelViewSet):
         qs = Ejercicio.objects.select_related('creador').prefetch_related('validaciones')
 
         if not user.is_authenticated:
-            return qs.none()
+            # Usuarios no autenticados solo ven ejercicios PUBLICADOS
+            return self._filtros_catalogo(
+                qs.filter(estado_publicacion=EstadoPublicacion.PUBLICADO)
+            )
 
         paciente_id = self.request.query_params.get('paciente')
         if self.action == 'list' and paciente_id:

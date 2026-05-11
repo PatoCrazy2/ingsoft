@@ -1,4 +1,4 @@
-<div class="bib-page">
+<div class="bib-page animate-in">
   <div class="bib-shell">
     <nav class="bib-nav" aria-label="Secciones">
       <a routerLink="/home" class="bib-nav__link">Inicio</a>
@@ -14,19 +14,28 @@
       <p class="bib-hero__kicker">Catálogo clínico</p>
       <h1 class="bib-hero__title">Biblioteca de ejercicios</h1>
       <p class="bib-hero__subtitle">
-        Datos reales del API cuando esté disponible; si no hay conexión, la app muestra un catálogo de demostración
-        para que puedas revisar el diseño.
+        Recursos publicados con criterios de seguridad y evidencia. La sesión demo del terapeuta se obtiene sola al
+        cargar la app si el API responde.
       </p>
 
-      @if (cargaFallida() === 'other') {
+      @if (cargaFallida() === 'auth') {
+        <div class="bib-banner bib-banner--auth" role="status">
+          <mat-icon aria-hidden="true">vpn_key</mat-icon>
+          <div>
+            <strong>Sesión requerida</strong>
+            <p>Para ver el catálogo real del servidor, entra con la cuenta demo del terapeuta.</p>
+            <a mat-stroked-button color="primary" routerLink="/home" class="bib-banner__btn">Ir al inicio</a>
+          </div>
+        </div>
+      } @else if (cargaFallida() === 'other') {
         <div class="bib-banner bib-banner--warn" role="alert">
           <mat-icon aria-hidden="true">cloud_off</mat-icon>
           <div>
             <strong>No se pudo conectar al API</strong>
             <p>
-              Revisa Docker, el proxy (<code>proxy.conf.json</code> → <code>localhost:8002</code>) y
-              <code>ng serve</code>. Mientras tanto deberías ver igualmente ejercicios de ejemplo cargados desde el
-              cliente.
+              Arranca el backend con Docker, confirma que el proxy apunte a
+              <code>http://localhost:8002</code> (archivo <code>proxy.conf.json</code>) y usa
+              <code>ng serve</code> (no abras solo el <code>index.html</code>).
             </p>
           </div>
         </div>
@@ -34,27 +43,18 @@
 
       <div class="bib-search-wrap">
         <label class="bib-search__label" for="bibSearchInput">Buscar ejercicios o categorías</label>
-        <div class="bib-search__box">
-          <span class="bib-search__glyph" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
-              <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
-              <path
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                d="M20 20 16.35 16.35"
-              />
-            </svg>
-          </span>
+        <div class="search-bar">
+          <svg class="search-bar__icon" xmlns="http://www.w3.org/2000/svg"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
           <input
             id="bibSearchInput"
-            class="bib-search__input"
             type="search"
             [(ngModel)]="searchQuery"
             (input)="onSearch()"
             placeholder="Rodilla, movilidad, fuerza…"
-            autocomplete="off"
-            enterkeyhint="search"
           />
         </div>
       </div>
