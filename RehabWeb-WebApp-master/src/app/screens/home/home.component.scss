@@ -161,7 +161,6 @@
 }
 
 .action-icon {
-  font-size: 24px;
   width: 44px;
   height: 44px;
   background: white;
@@ -170,6 +169,25 @@
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow-sm);
+
+  .action-icon__svg {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
+  &.blue {
+    background: #ebf2ff;
+    color: var(--color-info);
+  }
+  &.green {
+    background: #f0fdf4;
+    color: #16a34a;
+  }
+  &.orange {
+    background: #fff8e6;
+    color: var(--color-warning);
+  }
 }
 
 .action-text {

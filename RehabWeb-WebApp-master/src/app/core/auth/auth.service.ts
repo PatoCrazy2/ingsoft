@@ -35,22 +35,18 @@ export class AuthService {
   private demoLoginEnCurso: Promise<void> | null = null;
 
   constructor() {
-    if (typeof localStorage !== 'undefined') {
-      const savedToken = localStorage.getItem(STORAGE_KEY);
-      const savedRole = localStorage.getItem(ROLE_KEY);
-      
-      if (savedToken) {
-        this._token.set(savedToken);
-        this._role.set(savedRole);
-        this.ready.set(true);
-      } else if (isPlatformBrowser(this.platformId)) {
-        // Inicialización automática para evitar 401 en el primer arranque
-        void this.loginByRole('Terapeuta').then(() => this.ready.set(true));
-      } else {
-        this.ready.set(true);
-      }
-    } else {
+    if (!isPlatformBrowser(this.platformId)) {
       this.ready.set(true);
+      return;
+    }
+    const savedToken = localStorage.getItem(STORAGE_KEY);
+    const savedRole = localStorage.getItem(ROLE_KEY);
+    if (savedToken) {
+      this._token.set(savedToken);
+      this._role.set(savedRole);
+      this.ready.set(true);
+    } else {
+      void this.loginByRole('Terapeuta').then(() => this.ready.set(true));
     }
   }
 
@@ -115,7 +111,7 @@ export class AuthService {
   }
 
   setToken(token: string | null): void {
-    if (typeof localStorage !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       if (token && !token.startsWith('mock_token_')) {
         localStorage.setItem(STORAGE_KEY, token);
       } else {
@@ -126,7 +122,7 @@ export class AuthService {
   }
 
   setRole(role: string | null): void {
-    if (typeof localStorage !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       if (role) {
         localStorage.setItem(ROLE_KEY, role);
       } else {

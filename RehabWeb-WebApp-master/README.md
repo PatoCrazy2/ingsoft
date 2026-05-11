@@ -4,7 +4,7 @@ Frontend para la webapp de fisioterapia **RehabWeb**, construido con Angular 20,
 
 ---
 
-## 📋 Tabla de Tecnologías
+## Tabla de tecnologías
 
 | Tecnología | Versión |
 |---|---|
@@ -20,7 +20,7 @@ Frontend para la webapp de fisioterapia **RehabWeb**, construido con Angular 20,
 
 ---
 
-## 🚀 Instalación paso a paso
+## Instalación paso a paso
 
 ### 1. Clonar el repositorio
 
@@ -53,7 +53,7 @@ Los archivos generados se almacenarán en la carpeta `dist/`.
 
 ---
 
-## 📁 Estructura del proyecto
+## Estructura del proyecto
 
 ```
 src/app/
@@ -77,7 +77,7 @@ src/app/
 
 ---
 
-## 🔗 Conexión con el Backend
+## Conexión con el backend
 
 Este frontend se conecta a la API REST de **RehabWeb-Api** (Django REST Framework).
 
@@ -86,7 +86,7 @@ Este frontend se conecta a la API REST de **RehabWeb-Api** (Django REST Framewor
 
 ---
 
-## 🌿 Estrategia de Branching
+## Estrategia de branching
 
 Este proyecto sigue una estrategia de branching por equipos con revisión en staging.
 
@@ -153,8 +153,8 @@ chore(deps): actualizar Angular a v20.3
 
 ### Reglas importantes
 
-> ⚠️ **NUNCA** hacer push directo a `main` o `staging`.
+> **NUNCA** hacer push directo a `main` o `staging`.
 >
-> ⚠️ **SIEMPRE** crear Pull Requests para cualquier merge entre ramas.
+> **SIEMPRE** crear Pull Requests para cualquier merge entre ramas.
 >
-> ⚠️ Antes de crear un PR, hacer `git pull` de la rama destino para evitar conflictos.
+> Antes de crear un PR, hacer `git pull` de la rama destino para evitar conflictos.

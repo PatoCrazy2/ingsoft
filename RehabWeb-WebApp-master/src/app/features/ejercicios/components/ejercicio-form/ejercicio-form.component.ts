@@ -47,18 +47,18 @@ import { sinCaracteresBusquedaHtml, urlHttpOpcional } from '../../validators/eje
               <div class="col-md-6">
                 <label class="field__label">Nivel de Dificultad</label>
                 <select formControlName="dificultad" class="field__select">
-                  <option value="FACIL">🟢 Fácil / Inicial</option>
-                  <option value="INTERMEDIO">🟡 Intermedio / Progresivo</option>
-                  <option value="DIFICIL">🔴 Difícil / Avanzado</option>
+                  <option value="FACIL">Fácil / Inicial</option>
+                  <option value="INTERMEDIO">Intermedio / Progresivo</option>
+                  <option value="DIFICIL">Difícil / Avanzado</option>
                 </select>
               </div>
               <div class="col-md-6">
                 <label class="field__label">Área Terapéutica</label>
                 <select formControlName="categoria" class="field__select">
-                  <option value="FUERZA">💪 Fuerza Muscular</option>
-                  <option value="MOVILIDAD">🤸 Movilidad / Flexibilidad</option>
-                  <option value="EQUILIBRIO">⚖️ Equilibrio / Coordinación</option>
-                  <option value="POSTURAL">🧘 Higiene Postural</option>
+                  <option value="FUERZA">Fuerza muscular</option>
+                  <option value="MOVILIDAD">Movilidad / flexibilidad</option>
+                  <option value="EQUILIBRIO">Equilibrio / coordinación</option>
+                  <option value="POSTURAL">Higiene postural</option>
                 </select>
               </div>
             </div>

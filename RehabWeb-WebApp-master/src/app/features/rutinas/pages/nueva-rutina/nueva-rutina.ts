@@ -5,10 +5,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
-import { RouterLink } from '@angular/router';
 import { EjercicioCardComponent } from '../../../ejercicios/components/ejercicio-card/ejercicio-card.component';
 import { EjercicioService } from '../../../ejercicios/services/ejercicio.service';
 import { NuevaRutinaStateService } from '../../services/nueva-rutina-state';
@@ -23,9 +21,7 @@ import { PacienteListItem, PacienteService } from '../../services/paciente';
     MatFormFieldModule,
     MatSelectModule,
     MatProgressSpinnerModule,
-    MatIconModule,
     MatButtonModule,
-    RouterLink,
     EjercicioCardComponent,
   ],
   templateUrl: './nueva-rutina.html',

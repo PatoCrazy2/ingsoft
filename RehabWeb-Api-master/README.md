@@ -4,7 +4,7 @@ Backend API para la webapp de fisioterapia **RehabWeb**, construido con Django R
 
 ---
 
-## 📋 Tabla de Tecnologías
+## Tabla de tecnologías
 
 | Tecnología | Versión |
 |---|---|
@@ -18,7 +18,7 @@ Backend API para la webapp de fisioterapia **RehabWeb**, construido con Django R
 
 ---
 
-## 🚀 Instalación paso a paso
+## Instalación paso a paso
 
 ### 1. Clonar el repositorio
 
@@ -82,7 +82,7 @@ El servidor estará disponible en: `http://127.0.0.1:8000/`
 
 ---
 
-## 📁 Estructura del proyecto
+## Estructura del proyecto
 
 ```
 RehabWeb-Api/
@@ -108,7 +108,7 @@ RehabWeb-Api/
 
 ---
 
-## 🌿 Estrategia de Branching
+## Estrategia de branching
 
 Este proyecto sigue una estrategia de branching por equipos con revisión en staging.
 
@@ -175,13 +175,13 @@ chore(deps): actualizar Angular a v20.3
 
 ### Reglas importantes
 
-> ⚠️ **NUNCA** hacer push directo a `main` o `staging`.
+> **NUNCA** hacer push directo a `main` o `staging`.
 >
-> ⚠️ **SIEMPRE** crear Pull Requests para cualquier merge entre ramas.
+> **SIEMPRE** crear Pull Requests para cualquier merge entre ramas.
 >
-> ⚠️ Antes de crear un PR, hacer `git pull` de la rama destino para evitar conflictos.
+> Antes de crear un PR, hacer `git pull` de la rama destino para evitar conflictos.
 
-## 🔐 Credenciales de Desarrollo (Local)
+## Credenciales de desarrollo (local)
 
 Para acceder al panel de administración y probar la API en tu entorno local:
 - **URL Admin:** [http://localhost:8000/admin](http://localhost:8000/admin)

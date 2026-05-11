@@ -142,7 +142,7 @@ export class EjercicioService {
       palabrasPeligrosas.forEach((p: string) => {
         if (p && (desc.includes(p) || categoria.includes(p))) {
           puntuacion -= 20;
-          recomendaciónTags.push(`⚠️ Contraindicado: ${p}`);
+          recomendaciónTags.push(`Contraindicado: ${p}`);
         }
       });
 

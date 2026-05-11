@@ -7,7 +7,7 @@ Este repositorio centraliza el desarrollo del nuevo módulo de RehabWeb. Hemos e
 
 ---
 
-## 🚀 Guía de Inicio Rápido
+## Guía de inicio rápido
 
 ### Requisitos Previos
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y corriendo.
@@ -38,7 +38,7 @@ npm start
 
 ---
 
-## 🛠️ Lo que hemos actualizado (Staff Notes)
+## Lo que hemos actualizado (Staff Notes)
 
 1. **Dockerización Total:** La base de datos MySQL 8.0 y Django corren en contenedores aislados. El puerto `3306` y `8000` están mapeados a tu máquina local.
 2. **Variables de Entorno (`os.getenv`):** El proyecto ahora lee la configuración desde un archivo `.env`. Esto permite que el mismo código funcione en Docker, en local o en un servidor de producción sin cambios manuales.
@@ -47,7 +47,7 @@ npm start
 
 ---
 
-## 📝 Flujo de Trabajo y Commits
+## Flujo de trabajo y commits
 
 Para mantener el orden profesional, utiliza **Conventional Commits**:
 - `feat: ...` para nuevas funcionalidades.

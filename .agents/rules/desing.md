@@ -322,10 +322,10 @@ box-shadow: var(--shadow-md);
 
 ## Anti-Patrones — NUNCA Hacer
 
-- ❌ Hardcodear colores en hex dentro de componentes (usar siempre tokens)
-- ❌ Usar `!important` para sobreescribir estilos de Material
-- ❌ Sombras de color morado/azul genéricas
-- ❌ Bordes `border-radius: 50%` en elementos que no sean avatares circulares
-- ❌ Mezclar escala de espaciado con valores arbitrarios
-- ❌ `font-family: Arial` o fuentes del sistema sin Inter como fallback
-- ❌ Gradientes de color llamativo en fondos de página (solo en acentos puntuales)
+- Hardcodear colores en hex dentro de componentes (usar siempre tokens)
+- Usar `!important` para sobreescribir estilos de Material
+- Sombras de color morado/azul genéricas
+- Bordes `border-radius: 50%` en elementos que no sean avatares circulares
+- Mezclar escala de espaciado con valores arbitrarios
+- `font-family: Arial` o fuentes del sistema sin Inter como fallback
+- Gradientes de color llamativo en fondos de página (solo en acentos puntuales)
