@@ -11,38 +11,82 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   standalone: true,
   imports: [CommonModule, EjercicioPreviewComponent, ValidacionPanelComponent],
   template: `
-    <div class="container-fluid py-5 animate-in">
-      <div class="row">
-        <div class="col-lg-8">
-          <div class="mb-4">
-             <h1 class="page-title">Revisión de Ejercicio</h1>
-             <p class="page-subtitle">Revisa el contenido antes de aprobar su publicación.</p>
+    <div class="validation-page animate-in">
+      <header class="val-header">
+        <div class="container-fluid">
+          <div class="row align-items-end">
+            <div class="col-lg-8">
+               <span class="val-kicker">Revisión por Pares</span>
+               <h1 class="val-title">Validación Clínica</h1>
+               <p class="val-subtitle">Asegura la calidad del contenido terapéutico antes de su publicación general.</p>
+            </div>
           </div>
-          @if (ejercicio) {
-            <app-ejercicio-preview [ejercicio]="ejercicio"></app-ejercicio-preview>
-          }
         </div>
-        <div class="col-lg-4">
-          <div class="sticky-top" style="top: var(--space-4);">
-            <app-validacion-panel 
-              (validated)="onValidate($event)">
-            </app-validacion-panel>
+      </header>
+
+      <div class="container-fluid py-4">
+        <div class="row g-4">
+          <div class="col-lg-8">
+            @if (ejercicio) {
+              <app-ejercicio-preview [ejercicio]="ejercicio"></app-ejercicio-preview>
+            } @else {
+              <div class="skeleton-preview"></div>
+            }
+          </div>
+          <div class="col-lg-4">
+            <div class="sticky-top" style="top: var(--space-4);">
+              <app-validacion-panel 
+                [historial]="ejercicio?.historial_validaciones || []"
+                (validated)="onValidate($event)">
+              </app-validacion-panel>
+            </div>
           </div>
         </div>
       </div>
     </div>
   `,
   styles: [`
-    .page-title {
-      font-size: var(--text-xl);
+    .validation-page { min-height: 100vh; background: var(--color-bg-app); }
+    
+    .val-header {
+      padding: var(--space-6) 0 var(--space-4);
+      background: var(--color-bg-card);
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--space-4);
+    }
+
+    .val-kicker {
+      font-size: var(--text-xs);
+      font-weight: var(--font-bold);
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .val-title {
+      font-size: var(--text-2xl);
       font-weight: var(--font-bold);
       color: var(--color-text-primary);
-      margin-bottom: var(--space-1);
+      margin: 0;
     }
-    .page-subtitle {
+
+    .val-subtitle {
       font-size: var(--text-m);
       color: var(--color-text-secondary);
+      margin: 4px 0 0;
     }
+
+    .skeleton-preview {
+      height: 600px;
+      background: var(--color-bg-card);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--color-border);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
   `]
 })
 export class EjercicioValidationPage implements OnInit {
@@ -64,10 +108,10 @@ export class EjercicioValidationPage implements OnInit {
     if (this.ejercicio) {
       this.service.validarEjercicio(this.ejercicio.id, data).subscribe({
         next: () => {
-          this.snack.open('Validación completada', 'Cerrar', { duration: 3000 });
+          this.snack.open('Revisión registrada con éxito', 'OK', { duration: 3000 });
           this.router.navigate(['/ejercicios/admin']);
         },
-        error: () => this.snack.open('Error al validar', 'Cerrar', { duration: 3000 })
+        error: () => this.snack.open('Error al procesar la validación', 'Cerrar', { duration: 3000 })
       });
     }
   }

@@ -1,77 +1,87 @@
 <div class="bib-page animate-in">
-  <div class="bib-shell">
-    <nav class="bib-nav" aria-label="Secciones">
-      <a routerLink="/home" class="bib-nav__link">Inicio</a>
-      <span class="bib-nav__sep" aria-hidden="true"></span>
-      <span class="bib-nav__current">Biblioteca</span>
-      <div class="bib-nav__actions">
-        <a routerLink="/ejercicios/admin/nuevo" class="bib-nav__link bib-nav__link--pill">Proponer ejercicio</a>
-        <a routerLink="/rutinas/nueva" class="bib-nav__link bib-nav__link--cta">Nueva rutina</a>
-      </div>
-    </nav>
+  <div class="bib-container">
+    
+    <!-- Sidebar de Filtros -->
+    <aside class="bib-sidebar">
+      <div class="filter-card">
+        <div class="filter-card__header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="filter-icon"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+          <h3>Filtros Clínicos</h3>
+        </div>
 
-    <header class="bib-hero">
-      <p class="bib-hero__kicker">Catálogo clínico</p>
-      <h1 class="bib-hero__title">Biblioteca de ejercicios</h1>
-      <p class="bib-hero__subtitle">
-        Datos reales del API cuando esté disponible; si no hay conexión, la app muestra un catálogo de demostración
-        para que puedas revisar el diseño.
-      </p>
-
-      @if (cargaFallida() === 'other') {
-        <div class="bib-banner bib-banner--warn" role="alert">
-          <mat-icon aria-hidden="true">cloud_off</mat-icon>
-          <div>
-            <strong>No se pudo conectar al API</strong>
-            <p>
-              Revisa Docker, el proxy (<code>proxy.conf.json</code> → <code>localhost:8002</code>) y
-              <code>ng serve</code>. Mientras tanto deberías ver igualmente ejercicios de ejemplo cargados desde el
-              cliente.
-            </p>
+        <div class="filter-section">
+          <label class="filter-label">Búsqueda rápida</label>
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" placeholder="Ej. Rodilla, Fuerza...">
           </div>
         </div>
-      }
 
-      <div class="bib-search-wrap">
-        <label class="bib-search__label" for="bibSearchInput">Buscar ejercicios o categorías</label>
-        <div class="search-bar">
-          <svg class="search-bar__icon" xmlns="http://www.w3.org/2000/svg"
-               viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <input
-            id="bibSearchInput"
-            type="search"
-            [(ngModel)]="searchQuery"
-            (input)="onSearch()"
-            placeholder="Rodilla, movilidad, fuerza…"
-          />
+        <div class="filter-section">
+          <label class="filter-label">Categoría Terapéutica</label>
+          <select class="filter-select" [ngModel]="selectedCategoria()" (ngModelChange)="selectedCategoria.set($event)">
+            <option value="">Todas las categorías</option>
+            @for (cat of categorias(); track cat.codigo) {
+              <option [value]="cat.codigo">{{ cat.nombre }}</option>
+            }
+          </select>
         </div>
-      </div>
-    </header>
 
-    <main class="bib-main">
+        <div class="filter-section">
+          <label class="filter-label">Nivel de Dificultad</label>
+          <div class="difficulty-options">
+            <button class="diff-btn" [class.active]="selectedDificultad() === 'FACIL'" (click)="selectedDificultad.set('FACIL')">Fácil</button>
+            <button class="diff-btn" [class.active]="selectedDificultad() === 'INTERMEDIO'" (click)="selectedDificultad.set('INTERMEDIO')">Medio</button>
+            <button class="diff-btn" [class.active]="selectedDificultad() === 'DIFICIL'" (click)="selectedDificultad.set('DIFICIL')">Difícil</button>
+          </div>
+        </div>
+
+        <button class="btn-clear" (click)="limpiarFiltros()" *ngIf="searchQuery() || selectedCategoria() || selectedDificultad()">
+          Limpiar todos los filtros
+        </button>
+      </div>
+
+      <div class="bib-stats-card mt-4">
+        <p class="stats-label">Resultados encontrados</p>
+        <p class="stats-value">{{ filteredEjercicios().length }}</p>
+      </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="bib-content">
+      <header class="bib-header">
+        <div>
+          <h1 class="bib-title">Biblioteca de Ejercicios</h1>
+          <p class="bib-subtitle">Catálogo de recursos validados para rehabilitación física.</p>
+        </div>
+      </header>
+
       @if (loading()) {
-        <div class="bib-state bib-state--loading">
-          <mat-spinner diameter="48"></mat-spinner>
-          <p>Cargando biblioteca…</p>
+        <div class="bib-state">
+          <div class="spinner-elegant"></div>
+          <p>Consultando catálogo clínico...</p>
+        </div>
+      } @else if (cargaFallida() === 'other') {
+        <div class="bib-error">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="error-icon"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <h3>Error de Conexión</h3>
+          <p>No se pudo conectar con el servidor de contenido. Por favor, asegúrate de que el backend esté en ejecución.</p>
+          <button class="btn-retry" (click)="cargar()">Reintentar conexión</button>
         </div>
       } @else {
         <div class="bib-grid">
           @for (e of filteredEjercicios(); track e.id) {
-            <app-ejercicio-card [ejercicio]="e" class="bib-grid__item"></app-ejercicio-card>
+            <app-ejercicio-card [ejercicio]="e" class="bib-card-item"></app-ejercicio-card>
           } @empty {
-            <div class="bib-state bib-state--empty">
-              <mat-icon>inventory_2</mat-icon>
-              <p>No hay ejercicios que mostrar con los filtros actuales.</p>
-              @if (searchQuery) {
-                <button type="button" class="bib-link-btn" (click)="limpiarBusqueda()">Limpiar búsqueda</button>
-              }
+            <div class="bib-empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="empty-icon"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+              <p>No se encontraron ejercicios que coincidan con los filtros seleccionados.</p>
+              <button class="btn-link" (click)="limpiarFiltros()">Mostrar todo el catálogo</button>
             </div>
           }
         </div>
       }
     </main>
+
   </div>
 </div>

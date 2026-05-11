@@ -1,3 +1,5 @@
+import { ValidacionEjercicio } from './validacion.model';
+
 export type EstadoPublicacion = 'BORRADOR' | 'PENDIENTE_VALIDACION' | 'PUBLICADO';
 
 export interface Ejercicio {
@@ -26,6 +28,7 @@ export interface Ejercicio {
   reps?: string;
   fecha_creacion?: string;
   fecha_actualizacion?: string;
+  historial_validaciones?: ValidacionEjercicio[];
 }
 
 export interface EjercicioFormData {

@@ -160,14 +160,6 @@
     text-align: center;
     padding: var(--space-5) var(--space-3) var(--space-2);
     color: var(--color-text-muted);
-
-    mat-icon {
-      font-size: 3rem;
-      width: 3rem;
-      height: 3rem;
-      opacity: 0.35;
-      margin-bottom: var(--space-2);
-    }
   }
 
   &__fail {
@@ -177,13 +169,6 @@
     background: var(--color-danger-bg);
     border: 1px solid var(--color-danger);
     color: var(--color-danger);
-
-    mat-icon {
-      font-size: 2.25rem;
-      width: 2.25rem;
-      height: 2.25rem;
-      margin-bottom: var(--space-2);
-    }
   }
 }
 
@@ -192,9 +177,27 @@
   max-width: 520px;
   margin: 0 auto;
 
-  &__icon {
-    margin-right: var(--space-1);
+  &__icon-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
     color: var(--color-text-muted);
+  }
+
+  .field-svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto var(--space-3);
+    display: block;
+
+    &.danger { color: var(--color-danger); }
+    &.muted { color: var(--color-text-muted); opacity: 0.5; }
   }
 
   ::ng-deep {
@@ -207,7 +210,7 @@
       border-radius: var(--radius-sm) !important;
     }
     .mat-mdc-form-field-flex { 
-      height: 40px !important;
+      height: 48px !important;
       align-items: center !important; 
     }
     .mdc-notched-outline__leading,
@@ -224,7 +227,7 @@
     .mat-mdc-select-value,
     .mat-mdc-input-element {
       font-family: var(--font-family) !important;
-      font-size: var(--text-s) !important;
+      font-size: var(--text-m) !important;
       color: var(--color-text-primary) !important;
     }
     .mat-mdc-form-field-subscript-wrapper { display: none; }
@@ -232,9 +235,8 @@
     .mat-mdc-form-field-icon-prefix {
       display: flex;
       align-items: center;
+      justify-content: center;
       color: var(--color-text-muted);
-      padding: 0 var(--space-2);
-      mat-icon { font-size: 18px; width: 18px; height: 18px; }
     }
   }
 }
@@ -243,14 +245,16 @@
   display: flex;
   gap: var(--space-3);
   align-items: flex-start;
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4);
   margin-bottom: var(--space-4);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   background: var(--color-danger-bg);
   border: 1px solid var(--color-danger);
   color: var(--color-danger);
 
   &__icon {
+    width: 24px;
+    height: 24px;
     flex-shrink: 0;
     margin-top: 2px;
   }
@@ -288,20 +292,16 @@
 
   &__empty {
     grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    padding: var(--space-6) var(--space-4);
+    padding: var(--space-8) var(--space-4);
     border-radius: var(--radius-lg);
     background: var(--color-bg-card);
     border: 1px dashed var(--color-border);
     color: var(--color-text-secondary);
-
-    mat-icon {
-      font-size: 2.5rem;
-      width: 2.5rem;
-      height: 2.5rem;
-      opacity: 0.35;
-      margin-bottom: var(--space-2);
-    }
   }
 }
 

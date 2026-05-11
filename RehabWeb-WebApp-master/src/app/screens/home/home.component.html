@@ -1,27 +1,113 @@
-<div class="pv animate-in">
-  <header class="pv-nav">
-    <a routerLink="/home" class="pv-nav__brand">RehabWeb</a>
-    <nav class="pv-nav__links" aria-label="Principal">
-      <a routerLink="/ejercicios" class="pv-nav__link">Biblioteca de ejercicios</a>
-      <a routerLink="/rutinas/nueva" class="pv-nav__link pv-nav__link--primary">Nueva rutina</a>
-    </nav>
+<div class="dashboard animate-in">
+  <header class="dashboard-header">
+    <div class="welcome">
+      <h1 class="title">Hola, {{ userRole() }}</h1>
+      <p class="subtitle">Bienvenido de nuevo a tu panel de control clínico.</p>
+    </div>
+    <div class="date-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="calendar-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      <span>11 de mayo, 2026</span>
+    </div>
   </header>
 
-  <main class="pv-main">
-    <section class="pv-hero">
-      <p class="pv-hero__eyebrow">Rehabilitación basada en evidencia</p>
-      <h1 class="pv-hero__title">
-        Acompañamiento clínico,
-        <span class="pv-hero__accent">paso a paso</span>
-      </h1>
-      <p class="pv-hero__lead">
-        Herramientas para terapeutas: biblioteca validada de ejercicios y creación de rutinas
-        alineadas al perfil del paciente.
-      </p>
-      <div class="pv-hero__ctas">
-        <a routerLink="/ejercicios" class="pv-btn pv-btn--solid">Explorar biblioteca</a>
-        <a routerLink="/rutinas/nueva" class="pv-btn pv-btn--ghost">Nueva rutina</a>
-      </div>
+  <div class="loading-overlay" *ngIf="loading()">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Sincronizando datos...</p>
+  </div>
+
+  <div class="dashboard-content" *ngIf="!loading()">
+    <!-- STATS GRID -->
+    <section class="stats-grid">
+      <!-- Admin Stats -->
+      <ng-container *ngIf="isAdmin()">
+        <div class="stat-card">
+          <div class="stat-icon-box blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Total Catálogo</p>
+            <h2 class="stat-value">{{ stats().totalEjercicios }}</h2>
+            <p class="stat-desc">Ejercicios registrados</p>
+          </div>
+        </div>
+        <div class="stat-card" [routerLink]="['/ejercicios/admin']" style="cursor: pointer;">
+          <div class="stat-icon-box warning">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Por Validar</p>
+            <h2 class="stat-value">{{ stats().pendientes }}</h2>
+            <p class="stat-desc">Revisiones pendientes de pares</p>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Terapeuta Stats -->
+      <ng-container *ngIf="isTerapeuta()">
+        <div class="stat-card">
+          <div class="stat-icon-box primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Mis Pacientes</p>
+            <h2 class="stat-value">{{ stats().pacientesActivos }}</h2>
+            <p class="stat-desc">Pacientes en seguimiento activo</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-box info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Rutinas Activas</p>
+            <h2 class="stat-value">{{ stats().rutinasAsignadas }}</h2>
+            <p class="stat-desc">Tratamientos en ejecución</p>
+          </div>
+        </div>
+      </ng-container>
     </section>
-  </main>
+
+    <!-- QUICK ACTIONS & INFO -->
+    <section class="dashboard-grid">
+      <div class="main-column">
+        <div class="info-card">
+          <h3 class="card-title">Accesos Rápidos</h3>
+          <div class="actions-list">
+            <a routerLink="/ejercicios/biblioteca" class="action-item">
+              <div class="action-icon blue">📚</div>
+              <div class="action-text">
+                <strong>Explorar Biblioteca</strong>
+                <span>Consulta el catálogo de ejercicios validados</span>
+              </div>
+            </a>
+            <a routerLink="/rutinas/nueva" class="action-item" *ngIf="isTerapeuta()">
+              <div class="action-icon green">✍️</div>
+              <div class="action-text">
+                <strong>Crear Nueva Rutina</strong>
+                <span>Asigna ejercicios a un paciente específico</span>
+              </div>
+            </a>
+            <a routerLink="/ejercicios/admin" class="action-item" *ngIf="isAdmin()">
+              <div class="action-icon orange">🛡️</div>
+              <div class="action-text">
+                <strong>Centro de Validación</strong>
+                <span>Revisa propuestas de otros terapeutas</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <aside class="side-column">
+        <div class="info-card status-card">
+          <h3 class="card-title">Estado del Sistema</h3>
+          <div class="status-indicator">
+            <div class="status-dot online"></div>
+            <span>API Conectada</span>
+          </div>
+          <p class="status-helper">Todos los módulos están operativos y sincronizados con el servidor.</p>
+        </div>
+      </aside>
+    </section>
+  </div>
 </div>

@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatRadioModule } from '@angular/material/radio';
 import { ValidacionEjercicio, ValidacionFormData } from '../../models/validacion.model';
 
@@ -16,127 +14,181 @@ import { ValidacionEjercicio, ValidacionFormData } from '../../models/validacion
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
-    MatIconModule,
     MatRadioModule
   ],
   template: `
-    <div class="validation-panel">
-      <h3 class="panel-title">
-        <mat-icon class="me-2 text-warning">rate_review</mat-icon> Panel de Validación
-      </h3>
+    <div class="validation-panel glass-panel">
+      <div class="panel-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="panel-icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <h3 class="panel-title">Panel de Validación</h3>
+      </div>
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="mb-4">
-          <label class="form-label">¿Es este ejercicio apto para publicación?</label>
-          <mat-radio-group formControlName="es_valido" class="d-flex gap-4">
-            <mat-radio-button [value]="true" color="primary">SÍ, ES VÁLIDO</mat-radio-button>
-            <mat-radio-button [value]="false" color="warn">NO, REQUIERE CAMBIOS</mat-radio-button>
-          </mat-radio-group>
-        </div>
-
-        <mat-form-field appearance="outline" class="w-100 mb-3 dark-field">
-          <mat-label>Comentarios de revisión</mat-label>
-          <textarea matInput formControlName="comentario" rows="4" 
-            placeholder="Explica los motivos de tu decisión o sugiere mejoras..."></textarea>
-          <mat-hint>Estos comentarios serán visibles para el autor si se rechaza.</mat-hint>
-        </mat-form-field>
-
-        <div class="d-flex justify-content-end mt-4">
-          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid" class="submit-btn">
-            FINALIZAR REVISIÓN
-          </button>
-        </div>
-      </form>
-
-      <div *ngIf="historial.length > 0" class="mt-5">
-        <h5 class="history-title">Historial de Validaciones</h5>
-        <div class="history-list">
-          <div *ngFor="let v of historial" class="history-item">
-            <div class="d-flex justify-content-between">
-               <span class="badge" 
-                     [class.badge--published]="v.es_valido"
-                     [class.badge--danger]="!v.es_valido">
-                 {{ v.es_valido ? 'APROBADO' : 'RECHAZADO' }}
-               </span>
-               <span class="small text-secondary">{{ v.fecha_validacion | date:'short' }}</span>
-            </div>
-            <p class="mb-0 mt-2 fst-italic">"{{ v.comentario }}"</p>
-            <p class="small text-secondary mb-0">Por: {{ v.revisor_nombre }}</p>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="val-form">
+        <div class="form-section">
+          <label class="form-label">¿Es apto para publicación?</label>
+          <div class="radio-group">
+            <label class="radio-item" [class.active]="form.get('es_valido')?.value === true">
+              <input type="radio" [value]="true" formControlName="es_valido">
+              <span class="radio-label success">Aprobar</span>
+            </label>
+            <label class="radio-item" [class.active]="form.get('es_valido')?.value === false">
+              <input type="radio" [value]="false" formControlName="es_valido">
+              <span class="radio-label danger">Rechazar</span>
+            </label>
           </div>
         </div>
-      </div>
+
+        <div class="form-section">
+          <label class="form-label" for="comentario">Comentarios de revisión</label>
+          <textarea id="comentario" formControlName="comentario" rows="4" 
+                    class="elegant-textarea"
+                    placeholder="Escribe aquí tus observaciones técnicas..."></textarea>
+          <p class="form-hint">Visible para el autor si se rechaza.</p>
+        </div>
+
+        <button type="submit" [disabled]="form.invalid" class="btn-submit-premium">
+          Finalizar Revisión
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="btn-icon"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </button>
+      </form>
+
+      @if (historial.length > 0) {
+        <div class="history-section">
+          <h4 class="history-title">Historial de Revisiones</h4>
+          <div class="history-list">
+            <div *ngFor="let v of historial" class="history-item">
+              <div class="item-head">
+                 <span class="status-badge" [class.success]="v.es_valido" [class.danger]="!v.es_valido">
+                   {{ v.es_valido ? 'Aprobado' : 'Rechazado' }}
+                 </span>
+                 <span class="item-date">{{ v.fecha_validacion | date:'dd MMM, yyyy' }}</span>
+              </div>
+              <p class="item-comment">"{{ v.comentario }}"</p>
+              <p class="item-author">Por: {{ v.revisor_nombre }}</p>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   `,
   styles: [`
-    .validation-panel {
+    .glass-panel {
       background: var(--color-bg-card);
       border: 1px solid var(--color-border);
-      border-radius: var(--radius-lg);
-      padding: var(--space-4);
-      box-shadow: var(--shadow-sm);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-lg);
     }
 
-    .panel-title {
-      font-size: var(--text-l);
-      font-weight: var(--font-bold);
-      color: var(--color-text-primary);
-      margin-bottom: var(--space-4);
+    .panel-header {
       display: flex;
       align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-5);
+      color: var(--color-primary);
     }
-    
+
+    .panel-icon { width: 24px; height: 24px; }
+    .panel-title { font-size: var(--text-l); font-weight: var(--font-bold); color: var(--color-text-primary); margin: 0; }
+
+    .form-section { margin-bottom: var(--space-4); }
+
     .form-label {
       display: block;
-      font-size: var(--text-s);
+      font-size: var(--text-xs);
       font-weight: var(--font-bold);
-      color: var(--color-text-primary);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wide);
       margin-bottom: var(--space-2);
     }
 
-    .dark-field ::ng-deep .mat-mdc-form-field-flex {
-      background-color: var(--color-bg-app) !important;
-      border-radius: var(--radius-sm) !important;
+    .radio-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2);
     }
 
-    .submit-btn {
-      border-radius: var(--radius-xl) !important;
-      font-weight: var(--font-bold);
-      background: var(--color-primary);
+    .radio-item {
+      position: relative;
+      cursor: pointer;
+      input { position: absolute; opacity: 0; }
+      .radio-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-2);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        font-size: var(--text-s);
+        font-weight: var(--font-bold);
+        color: var(--color-text-secondary);
+        transition: all var(--duration-base);
+      }
+      &.active {
+        .radio-label.success { background: var(--color-primary-low); border-color: var(--color-primary); color: var(--color-primary); }
+        .radio-label.danger { background: var(--color-danger-bg); border-color: var(--color-danger); color: var(--color-danger); }
+      }
     }
 
-    .history-title {
-      font-size: var(--text-m);
-      font-weight: var(--font-bold);
-      color: var(--color-text-secondary);
-      margin-bottom: var(--space-3);
-    }
-
-    .history-list {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-3);
-    }
-
-    .history-item {
-      padding: var(--space-3);
+    .elegant-textarea {
+      width: 100%;
+      background: var(--color-bg-app);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-md);
-      background: var(--color-bg-app);
+      padding: var(--space-3);
+      font-family: inherit;
+      font-size: var(--text-s);
+      color: var(--color-text-primary);
+      outline: none;
+      transition: all var(--duration-base);
+      resize: none;
+      &:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(0, 167, 129, 0.1); }
     }
 
-    .badge {
-      display: inline-flex;
+    .form-hint { font-size: var(--text-xs); color: var(--color-text-muted); margin-top: 4px; }
+
+    .btn-submit-premium {
+      width: 100%;
+      display: flex;
       align-items: center;
-      padding: var(--space-1) var(--space-3);
-      border-radius: var(--radius-pill);
-      font-size: var(--text-xs);
+      justify-content: center;
+      gap: var(--space-2);
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      padding: var(--space-3);
+      border-radius: var(--radius-lg);
+      font-weight: var(--font-bold);
+      cursor: pointer;
+      transition: all var(--duration-base);
+      &:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.1); box-shadow: var(--shadow-md); }
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
+    }
+    .btn-icon { width: 18px; height: 18px; }
+
+    .history-section { margin-top: var(--space-6); padding-top: var(--space-5); border-top: 1px solid var(--color-border); }
+    .history-title { font-size: var(--text-s); font-weight: var(--font-bold); color: var(--color-text-secondary); margin-bottom: var(--space-3); }
+    
+    .history-list { display: flex; flex-direction: column; gap: var(--space-3); }
+    .history-item {
+      padding: var(--space-3);
+      background: var(--color-bg-app);
+      border-radius: var(--radius-md);
+    }
+    .item-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2); }
+    .status-badge {
+      font-size: 10px;
       font-weight: var(--font-bold);
       text-transform: uppercase;
-
-      &--published { background: var(--color-primary-low); color: var(--color-primary); }
-      &--danger { background: var(--color-danger-bg); color: var(--color-danger); }
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      &.success { background: var(--color-primary-low); color: var(--color-primary); }
+      &.danger { background: var(--color-danger-bg); color: var(--color-danger); }
     }
+    .item-date { font-size: var(--text-xs); color: var(--color-text-muted); }
+    .item-comment { font-size: var(--text-s); color: var(--color-text-primary); font-style: italic; margin: 0 0 4px; }
+    .item-author { font-size: var(--text-xs); color: var(--color-text-muted); margin: 0; }
   `]
 })
 export class ValidacionPanelComponent {

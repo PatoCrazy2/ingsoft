@@ -5,11 +5,11 @@ import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { EjercicioService } from '../../services/ejercicio.service';
 import { Ejercicio } from '../../models/ejercicio.model';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-admin-ejercicios',
@@ -18,7 +18,6 @@ import { FormsModule } from '@angular/forms';
     CommonModule,
     MatTableModule,
     MatButtonModule,
-    MatIconModule,
     MatTooltipModule,
     RouterLink,
     FormsModule
@@ -27,17 +26,12 @@ import { FormsModule } from '@angular/forms';
     <div class="admin-container animate-in">
       <header class="admin-header d-flex justify-content-between align-items-end mb-5">
         <div>
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-2">
-              <li class="breadcrumb-item"><a routerLink="/ejercicios">Biblioteca</a></li>
-              <li class="breadcrumb-item active">Admin</li>
-            </ol>
-          </nav>
           <h1 class="admin-title">Gestión de Contenido</h1>
           <p class="admin-subtitle">Controla la calidad y publicación del catálogo terapéutico.</p>
         </div>
         <button mat-flat-button color="primary" routerLink="/ejercicios/admin/nuevo" class="add-btn">
-          <mat-icon>add</mat-icon> NUEVO EJERCICIO
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="btn-svg"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>NUEVO EJERCICIO</span>
         </button>
       </header>
 
@@ -103,8 +97,8 @@ import { FormsModule } from '@angular/forms';
             <ng-container matColumnDef="dificultad">
               <th mat-header-cell *matHeaderCellDef>VALORACIÓN</th>
               <td mat-cell *matCellDef="let e"> 
-                <div class="d-flex align-items-center">
-                   <mat-icon class="me-1 text-warning fs-5">star</mat-icon>
+                <div class="d-flex align-items-center rating">
+                   <svg viewBox="0 0 24 24" fill="currentColor" class="star-icon"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                    <span>{{ e.puntuacion_media || 'N/A' }}</span>
                 </div>
               </td>
@@ -113,16 +107,17 @@ import { FormsModule } from '@angular/forms';
             <ng-container matColumnDef="acciones">
               <th mat-header-cell *matHeaderCellDef>ACCIONES</th>
               <td mat-cell *matCellDef="let e">
-                <div class="d-flex gap-2 justify-content-end">
-                  <button mat-icon-button class="action-btn" [routerLink]="['/ejercicios/admin', e.id, 'editar']">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button mat-icon-button class="action-btn preview" [routerLink]="['/ejercicios/admin', e.id, 'preview']">
-                    <mat-icon>visibility</mat-icon>
-                  </button>
+                <div class="d-flex gap-2 justify-content-end align-items-center h-100">
                   @if (e.estado === 'PENDIENTE_VALIDACION') {
-                    <button mat-raised-button color="accent" class="validate-btn" [routerLink]="['/ejercicios/admin', e.id, 'validaciones']">
-                      VALIDAR
+                    <button class="btn-validate-elegant" [routerLink]="['/ejercicios/admin', e.id, 'validaciones']">
+                      Validar ahora
+                    </button>
+                  } @else {
+                    <button class="icon-action-btn" [routerLink]="['/ejercicios/admin', e.id, 'editar']" title="Editar">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="action-svg"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
+                    <button class="icon-action-btn preview" [routerLink]="['/ejercicios/admin', e.id, 'preview']" title="Ver Detalle">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="action-svg"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     </button>
                   }
                 </div>
@@ -140,7 +135,7 @@ import { FormsModule } from '@angular/forms';
     .admin-container {
       max-width: 1300px;
       margin: 0 auto;
-      padding: var(--space-8) var(--space-4);
+      padding: var(--space-4) var(--space-4);
     }
 
     .admin-title {
@@ -155,24 +150,22 @@ import { FormsModule } from '@angular/forms';
       color: var(--color-text-secondary);
     }
 
-    .breadcrumb-item a {
-      text-decoration: none;
-      color: var(--color-primary);
-      font-size: var(--text-s);
-      transition: color var(--duration-base);
-      &:hover { color: var(--color-primary-low); }
-    }
-
     .add-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
       padding: var(--space-2) var(--space-5);
-      border-radius: var(--radius-xl) !important;
+      border-radius: var(--radius-xl);
       font-weight: var(--font-bold);
-      height: 48px;
       background: var(--color-primary);
+      color: white;
+      border: none;
+      cursor: pointer;
       transition: transform var(--duration-fast), filter var(--duration-base);
       &:hover { transform: translateY(-1px); filter: brightness(1.1); }
-      &:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }
     }
+
+    .btn-svg { width: 18px; height: 18px; }
 
     .dashboard-card {
       background: var(--color-bg-card);
@@ -207,7 +200,7 @@ import { FormsModule } from '@angular/forms';
     .image-box {
       width: 50px;
       height: 50px;
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-md);
       overflow: hidden;
       background: var(--color-border);
     }
@@ -248,20 +241,43 @@ import { FormsModule } from '@angular/forms';
       }
     }
 
-    .action-btn {
-      color: var(--color-text-secondary);
-      transition: all var(--duration-base);
-      &:hover { background: var(--color-primary-low); color: var(--color-primary); }
-      &.preview:hover { color: var(--color-info); }
-      &:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }
+    .rating {
+      color: var(--color-text-primary);
+      font-weight: var(--font-medium);
+      gap: 4px;
     }
+    .star-icon { width: 16px; height: 16px; color: var(--color-warning); }
 
-    .validate-btn {
+    .icon-action-btn {
+      background: none;
+      border: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
+      padding: 6px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--duration-base);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover { background: var(--color-primary-low); color: var(--color-primary); border-color: var(--color-primary); }
+      &.preview:hover { color: var(--color-info); border-color: var(--color-info); background: #EBF2FF; }
+    }
+    .action-svg { width: 18px; height: 18px; }
+
+    .btn-validate-elegant {
+      background: var(--color-primary-low);
+      color: var(--color-primary);
+      border: 1px solid var(--color-primary);
+      padding: 0 var(--space-3);
+      height: 28px;
+      border-radius: var(--radius-pill);
       font-size: var(--text-xs);
       font-weight: var(--font-bold);
-      padding: 0 var(--space-3) !important;
-      height: 32px;
-      border-radius: var(--radius-md) !important;
+      cursor: pointer;
+      transition: all var(--duration-base);
+      white-space: nowrap;
+      &:hover { background: var(--color-primary); color: white; transform: translateY(-1px); }
     }
 
     $control-height: 40px;
@@ -332,8 +348,13 @@ import { FormsModule } from '@angular/forms';
 })
 export class AdminEjerciciosPage implements OnInit {
   private readonly ejercicioService = inject(EjercicioService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+
+  constructor() {
+    afterNextRender(() => this.recargar());
+  }
 
   ejercicios = this.ejercicioService.ejercicios;
   searchTerm = signal('');
@@ -356,8 +377,6 @@ export class AdminEjerciciosPage implements OnInit {
   displayedColumns: string[] = ['nombre', 'estado', 'dificultad', 'acciones'];
 
   ngOnInit(): void {
-    afterNextRender(() => this.recargar());
-    
     this.router.events
       .pipe(
         filter((e): e is NavigationEnd => e instanceof NavigationEnd),
@@ -372,6 +391,8 @@ export class AdminEjerciciosPage implements OnInit {
   }
 
   private recargar(): void {
-    this.ejercicioService.getEjercicios().subscribe();
+    void this.auth.asegurarTokenDemo().then(() => {
+      this.ejercicioService.getEjercicios().subscribe();
+    });
   }
 }
