@@ -1,9 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EjercicioService } from '../../services/ejercicio.service';
 import { EjercicioPreviewComponent } from '../../components/ejercicio-preview/ejercicio-preview.component';
 import { Ejercicio } from '../../models/ejercicio.model';
@@ -13,38 +10,78 @@ import { Ejercicio } from '../../models/ejercicio.model';
   imports: [
     CommonModule,
     RouterLink,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
     EjercicioPreviewComponent,
   ],
   template: `
-    <div class="container py-4">
-      @if (cargando()) {
-        <div class="text-center py-5">
-          <mat-spinner diameter="48"></mat-spinner>
-          <p class="mt-3 text-secondary">Cargando ficha del ejercicio…</p>
-        </div>
-      } @else if (ejercicio()) {
-        <app-ejercicio-preview [ejercicio]="ejercicio()!"></app-ejercicio-preview>
-      } @else {
-        <div class="detalle-fail rounded-4 p-4 border" role="alert">
-          <p class="mb-3 text-secondary">No se encontró el ejercicio o no hay datos para mostrar.</p>
-          <a mat-stroked-button color="primary" routerLink="/ejercicios">Volver a la biblioteca</a>
-        </div>
-      }
+    <div class="detail-page animate-in">
+      <div class="container py-4">
+        @if (cargando()) {
+          <div class="loading-state">
+            <div class="spinner-elegant"></div>
+            <p>Preparando ficha clínica…</p>
+          </div>
+        } @else if (ejercicio()) {
+          <app-ejercicio-preview [ejercicio]="ejercicio()!"></app-ejercicio-preview>
+        } @else {
+          <div class="error-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="error-icon"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <p>No se pudo cargar el ejercicio solicitado.</p>
+            <a routerLink="/ejercicios" class="btn-back">Regresar a la Biblioteca</a>
+          </div>
+        }
+      </div>
     </div>
   `,
-  styles: [
-    `
-      .detalle-fail {
-        max-width: 560px;
-        margin: 2rem auto;
-        background: #fffbeb;
-        border-color: #fcd34d !important;
-      }
-    `,
-  ],
+  styles: [`
+    .detail-page { min-height: 80vh; }
+    
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-8) 0;
+      color: var(--color-text-secondary);
+    }
+
+    .spinner-elegant {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--color-primary-low);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: var(--space-3);
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-state {
+      max-width: 500px;
+      margin: var(--space-8) auto;
+      text-align: center;
+      padding: var(--space-7);
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+    }
+
+    .error-icon { width: 48px; height: 48px; color: var(--color-warning); margin-bottom: var(--space-3); }
+
+    .btn-back {
+      display: inline-block;
+      margin-top: var(--space-4);
+      padding: var(--space-2) var(--space-5);
+      background: var(--color-primary);
+      color: white;
+      text-decoration: none;
+      font-weight: var(--font-bold);
+      border-radius: var(--radius-pill);
+      transition: all var(--duration-base);
+      &:hover { transform: translateY(-1px); filter: brightness(1.1); }
+    }
+  `]
 })
 export class EjercicioDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -62,15 +99,7 @@ export class EjercicioDetailPage implements OnInit {
     }
     this.service.getEjercicio(id).subscribe({
       next: (data) => {
-        const instr =
-          data.instrucciones?.trim() ||
-          'Añade instrucciones paso a paso desde la edición del ejercicio. Mientras tanto, usa la descripción y la evidencia como guía.';
-        this.ejercicio.set({
-          ...data,
-          instrucciones: instr,
-          material_necesario:
-            data.material_necesario?.trim() || 'Sin equipamiento especial indicado.',
-        });
+        this.ejercicio.set(data);
         this.cargando.set(false);
       },
       error: () => {

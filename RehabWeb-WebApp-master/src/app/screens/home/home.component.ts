@@ -1,14 +1,70 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, computed, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../core/auth/auth.service';
+import { EjercicioService } from '../../features/ejercicios/services/ejercicio.service';
+import { PacienteService } from '../../features/rutinas/services/paciente';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-/**
- * Vista presentacional: solo navegación hacia Biblioteca y Nueva rutina.
- */
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink],
+  imports: [CommonModule, RouterLink, MatProgressSpinnerModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent {}
+export class HomeComponent implements OnInit {
+  private auth = inject(AuthService);
+  private ejerciciosService = inject(EjercicioService);
+  private pacienteService = inject(PacienteService);
+
+  userRole = this.auth.role;
+  isAdmin = computed(() => this.userRole() === 'Admin');
+  isTerapeuta = computed(() => this.userRole() === 'Terapeuta');
+  isPaciente = computed(() => this.userRole() === 'Paciente');
+
+  stats = signal<{
+    totalEjercicios: number;
+    pendientes: number;
+    pacientesActivos: number;
+    rutinasAsignadas: number;
+  }>({
+    totalEjercicios: 0,
+    pendientes: 0,
+    pacientesActivos: 0,
+    rutinasAsignadas: 0
+  });
+
+  loading = signal(true);
+
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
+
+  private loadDashboardData() {
+    this.loading.set(true);
+    
+    const calls = {
+      ejercicios: this.ejerciciosService.getEjercicios().pipe(catchError(() => of([]))),
+      pacientes: this.isTerapeuta() ? this.pacienteService.listar().pipe(catchError(() => of([]))) : of([])
+    };
+
+    forkJoin(calls).subscribe({
+      next: (res) => {
+        const ejercicios = res.ejercicios;
+        const pacientes = res.pacientes;
+
+        this.stats.set({
+          totalEjercicios: ejercicios.length,
+          pendientes: ejercicios.filter(e => e.estado === 'PENDIENTE_VALIDACION').length,
+          pacientesActivos: pacientes.length,
+          rutinasAsignadas: Math.floor(pacientes.length * 0.8) // Mocked stat
+        });
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false)
+    });
+  }
+}

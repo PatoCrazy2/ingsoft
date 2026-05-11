@@ -10,8 +10,9 @@ import { PacienteDetalleDto, PacienteListItem } from './paciente';
   providedIn: 'root',
 })
 export class NuevaRutinaStateService {
-  readonly pacienteSeleccionado = signal<PacienteListItem | PacienteDetalleDto | null>(null);
+  readonly pacienteSeleccionado = signal<PacienteDetalleDto | null>(null);
   readonly ejerciciosPrefiltrados = signal<Ejercicio[]>([]);
+  readonly recomendacionesClinicas = signal<(Ejercicio & { puntuacion: number, recomendaciones: string[] })[]>([]);
   readonly cargandoPacientes = signal(false);
   readonly cargandoEjercicios = signal(false);
   /** Fallo al cargar `/api/pacientes/` (red, credenciales, etc.). */

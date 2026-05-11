@@ -1,8 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Ejercicio, EjercicioFormData } from '../../models/ejercicio.model';
+import { sinCaracteresBusquedaHtml, urlHttpOpcional } from '../../validators/ejercicio-form.validators';
 
 @Component({
   selector: 'app-ejercicio-form',
@@ -14,13 +15,6 @@ import { Ejercicio, EjercicioFormData } from '../../models/ejercicio.model';
   ],
   template: `
     <div class="form-wrapper animate-in">
-      <nav class="form-nav mb-4">
-        <button type="button" class="back-link" (click)="cancelClick.emit()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-          Volver a la administración
-        </button>
-      </nav>
-
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="glass-form">
         <div class="form-header">
            <h2 class="form-title">{{ isEdit ? 'Actualizar Ficha Médica' : 'Nueva Propuesta de Ejercicio' }}</h2>
@@ -35,12 +29,18 @@ import { Ejercicio, EjercicioFormData } from '../../models/ejercicio.model';
             <p class="section-desc">Define cómo aparecerá el ejercicio en el catálogo.</p>
             
             <div class="field-group">
-              <label class="field__label">Nombre del Ejercicio</label>
+              <label class="field__label">Nombre del Ejercicio ({{ longitud('nombre') }}/140)</label>
               <div class="input-with-icon">
                 <svg class="input-with-icon__icon--left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v8H2z"></path><line x1="6" y1="12" x2="6" y2="12"></line></svg>
-                <input type="text" formControlName="nombre" class="has-icon-left" placeholder="Ej: Flexión de cadera en supino">
+                <input type="text" formControlName="nombre" class="has-icon-left" 
+                       placeholder="Ej: Flexión de cadera en supino"
+                       (copy)="bloquearCopia($event)" (cut)="bloquearCopia($event)" (paste)="bloquearPegado($event)">
               </div>
-              <span class="field__error" *ngIf="form.get('nombre')?.invalid && form.get('nombre')?.touched">Este campo es obligatorio</span>
+              <span class="field__error" *ngIf="form.get('nombre')?.invalid && form.get('nombre')?.touched">
+                @if (form.get('nombre')?.hasError('required')) { Requerido }
+                @else if (form.get('nombre')?.hasError('minlength')) { Mínimo 3 caracteres }
+                @else if (form.get('nombre')?.hasError('caracteresInvalidos')) { No se permiten caracteres especiales de búsqueda }
+              </span>
             </div>
 
             <div class="row g-3">
@@ -64,8 +64,13 @@ import { Ejercicio, EjercicioFormData } from '../../models/ejercicio.model';
             </div>
 
             <div class="mt-3">
-              <label class="field__label">Objetivo Clínico (Resumen)</label>
-              <textarea formControlName="descripcion" class="field__textarea" rows="2" placeholder="Describe brevemente qué se busca lograr..."></textarea>
+              <label class="field__label">Objetivo Clínico ({{ longitud('descripcion') }}/800)</label>
+              <textarea formControlName="descripcion" class="field__textarea" rows="2" 
+                        placeholder="Describe brevemente qué se busca lograr..."
+                        (copy)="bloquearCopia($event)" (cut)="bloquearCopia($event)" (paste)="bloquearPegado($event)"></textarea>
+              <span class="field__error" *ngIf="form.get('descripcion')?.invalid && form.get('descripcion')?.touched">
+                Mínimo 20 caracteres. No usar caracteres de búsqueda.
+              </span>
             </div>
           </div>
 
@@ -76,15 +81,22 @@ import { Ejercicio, EjercicioFormData } from '../../models/ejercicio.model';
             <p class="section-desc">Instrucciones detalladas para el terapeuta y el paciente.</p>
 
             <div class="mb-3">
-              <label class="field__label">Guía Paso a Paso</label>
-              <textarea formControlName="instrucciones" class="field__textarea" rows="5" placeholder="1. Posición inicial...\n2. Movimiento...\n3. Puntos de control..."></textarea>
+              <label class="field__label">Guía Paso a Paso ({{ longitud('instrucciones') }}/4000)</label>
+              <textarea formControlName="instrucciones" class="field__textarea" rows="5" 
+                        placeholder="1. Posición inicial...\n2. Movimiento...\n3. Puntos de control..."
+                        (copy)="bloquearCopia($event)" (cut)="bloquearCopia($event)" (paste)="bloquearPegado($event)"></textarea>
+              <span class="field__error" *ngIf="form.get('instrucciones')?.invalid && form.get('instrucciones')?.touched">
+                Mínimo 40 caracteres detallando la técnica.
+              </span>
             </div>
 
             <div>
               <label class="field__label">Equipamiento Necesario</label>
               <div class="input-with-icon">
                 <svg class="input-with-icon__icon--left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-                <input type="text" formControlName="material_necesario" class="has-icon-left" placeholder="Ej: Banda elástica, pelota suiza, silla estable...">
+                <input type="text" formControlName="material_necesario" class="has-icon-left" 
+                       placeholder="Ej: Banda elástica, pelota suiza, silla estable..."
+                       (copy)="bloquearCopia($event)" (cut)="bloquearCopia($event)" (paste)="bloquearPegado($event)">
               </div>
             </div>
           </div>
@@ -102,6 +114,7 @@ import { Ejercicio, EjercicioFormData } from '../../models/ejercicio.model';
                   <input type="text" formControlName="video_url" class="has-icon-right" placeholder="https://youtube.com/...">
                   <svg class="input-with-icon__icon--right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
                 </div>
+                <span class="field__error" *ngIf="form.get('video_url')?.invalid && form.get('video_url')?.touched">URL no válida</span>
               </div>
               <div class="col-md-6">
                 <label class="field__label">Imagen de Portada (URL)</label>
@@ -109,13 +122,16 @@ import { Ejercicio, EjercicioFormData } from '../../models/ejercicio.model';
                   <input type="text" formControlName="imagen_url" class="has-icon-right" placeholder="https://cloudinary.com/...">
                   <svg class="input-with-icon__icon--right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 </div>
+                <span class="field__error" *ngIf="form.get('imagen_url')?.invalid && form.get('imagen_url')?.touched">URL no válida</span>
               </div>
             </div>
 
             <div class="mt-4">
               <label class="field__label">Base Científica / Justificación</label>
               <div class="input-with-icon">
-                <textarea formControlName="evidencia_cientifica" class="field__textarea has-icon-right" rows="2" placeholder="Cita de estudio o razonamiento clínico para el validador..."></textarea>
+                <textarea formControlName="evidencia_cientifica" class="field__textarea has-icon-right" rows="2" 
+                          placeholder="Cita de estudio o razonamiento clínico para el validador..."
+                          (copy)="bloquearCopia($event)" (cut)="bloquearCopia($event)" (paste)="bloquearPegado($event)"></textarea>
                 <svg class="input-with-icon__icon--right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 4c0 2.72-2.6 5.3-5.91 5.91a22 22 0 0 1-3.95 2.1l-3-3z"></path><line x1="8" y1="8" x2="12" y2="12"/></svg>
               </div>
             </div>
@@ -372,6 +388,7 @@ export class EjercicioFormComponent implements OnInit {
   @Output() cancelClick = new EventEmitter<void>();
 
   private fb = inject(FormBuilder);
+  private snack = inject(MatSnackBar);
   form!: FormGroup;
 
   ngOnInit(): void {
@@ -381,23 +398,68 @@ export class EjercicioFormComponent implements OnInit {
     }
   }
 
+  longitud(controlName: string): number {
+    const v = this.form.get(controlName)?.value;
+    return typeof v === 'string' ? v.length : 0;
+  }
+
+  bloquearPegado(event: ClipboardEvent): void {
+    event.preventDefault();
+    this.snack.open('Pegar no está permitido. Escribe el contenido manualmente.', 'Cerrar', { duration: 4200 });
+  }
+
+  bloquearCopia(event: ClipboardEvent): void {
+    event.preventDefault();
+    this.snack.open('Copiar y cortar no están permitidos en este campo.', 'Cerrar', { duration: 3200 });
+  }
+
   private initForm(): void {
     this.form = this.fb.group({
-      nombre: ['', [Validators.required]],
-      descripcion: ['', [Validators.required]],
-      instrucciones: ['', [Validators.required]],
-      material_necesario: ['', [Validators.required]],
-      categoria: ['', [Validators.required]],
+      nombre: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(140),
+          sinCaracteresBusquedaHtml(true),
+        ],
+      ],
+      descripcion: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(20),
+          Validators.maxLength(800),
+          sinCaracteresBusquedaHtml(true),
+        ],
+      ],
+      instrucciones: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(40),
+          Validators.maxLength(4000),
+          sinCaracteresBusquedaHtml(false),
+        ],
+      ],
+      material_necesario: [
+        '',
+        [Validators.required, Validators.maxLength(200), sinCaracteresBusquedaHtml(true)],
+      ],
+      categoria: ['MOVILIDAD', [Validators.required]],
       dificultad: ['INTERMEDIO', [Validators.required]],
-      video_url: [''],
-      imagen_url: [''],
-      evidencia_cientifica: ['']
+      video_url: ['', [Validators.maxLength(500), urlHttpOpcional()]],
+      imagen_url: ['', [Validators.maxLength(500), urlHttpOpcional()]],
+      evidencia_cientifica: ['', [Validators.maxLength(2000), sinCaracteresBusquedaHtml(false)]],
     });
   }
 
   onSubmit(): void {
     if (this.form.valid) {
-      this.formSubmit.emit(this.form.value);
+      this.formSubmit.emit(this.form.value as EjercicioFormData);
+      return;
     }
+    this.form.markAllAsTouched();
+    this.snack.open('Revisa los campos marcados en rojo.', 'Cerrar', { duration: 4000 });
   }
 }

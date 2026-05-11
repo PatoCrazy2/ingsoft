@@ -132,6 +132,18 @@ class Command(BaseCommand):
             NivelMovilidad.NIVEL_2,
             TerritorioACV.HEMISFERIO_IZQUIERDO,
         )
+        upsert_paciente(
+            'paciente3@demo.rehab',
+            'Carlos Ruiz',
+            NivelMovilidad.NIVEL_1,
+            None,
+        )
+        # Hack para inyectar datos a Carlos sin cambiar la firma de la funcion
+        p3 = Paciente.objects.get(usuario__email='paciente3@demo.rehab')
+        perfil3 = p3.perfil_clinico
+        perfil3.diagnostico_principal = 'Esguince de Tobillo Grado III'
+        perfil3.restricciones = 'No apoyo, No impacto, No rotación'
+        perfil3.save()
 
         ev_base = (
             'Revisión narrativa sobre ejercicios terapéuticos seguros en población con ACV. '
