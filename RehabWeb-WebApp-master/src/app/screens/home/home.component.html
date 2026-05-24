@@ -2,7 +2,8 @@
   <header class="dashboard-header">
     <div class="welcome">
       <h1 class="title">Hola, {{ userRole() }}</h1>
-      <p class="subtitle">Bienvenido de nuevo a tu panel de control clínico.</p>
+      <p class="subtitle" *ngIf="!isPaciente()">Bienvenido de nuevo a tu panel de control clínico.</p>
+      <p class="subtitle" *ngIf="isPaciente()">Consulta tus ejercicios y el progreso de tu rehabilitación.</p>
     </div>
     <div class="date-badge">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="calendar-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -42,6 +43,30 @@
         </div>
       </ng-container>
 
+      <!-- Paciente Stats -->
+      <ng-container *ngIf="isPaciente()">
+        <div class="stat-card" [routerLink]="['/ejercicios']" style="cursor: pointer;">
+          <div class="stat-icon-box primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Ejercicios disponibles</p>
+            <h2 class="stat-value">{{ stats().totalEjercicios }}</h2>
+            <p class="stat-desc">En tu catálogo de rehabilitación</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-box info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Rutinas activas</p>
+            <h2 class="stat-value">{{ stats().rutinasAsignadas }}</h2>
+            <p class="stat-desc">Planes asignados por tu terapeuta</p>
+          </div>
+        </div>
+      </ng-container>
+
       <!-- Terapeuta Stats -->
       <ng-container *ngIf="isTerapeuta()">
         <div class="stat-card">
@@ -73,7 +98,7 @@
         <div class="info-card">
           <h3 class="card-title">Accesos Rápidos</h3>
           <div class="actions-list">
-            <a routerLink="/ejercicios/biblioteca" class="action-item">
+            <a routerLink="/ejercicios" class="action-item">
               <div class="action-icon blue" aria-hidden="true">
                 <svg class="action-icon__svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="m16 6 4 14"></path>
@@ -83,8 +108,8 @@
                 </svg>
               </div>
               <div class="action-text">
-                <strong>Explorar Biblioteca</strong>
-                <span>Consulta el catálogo de ejercicios validados</span>
+                <strong>{{ isPaciente() ? 'Ver catálogo de ejercicios' : 'Explorar Biblioteca' }}</strong>
+                <span>{{ isPaciente() ? 'Ejercicios validados para tu rehabilitación' : 'Consulta el catálogo de ejercicios validados' }}</span>
               </div>
             </a>
             <a routerLink="/rutinas/nueva" class="action-item" *ngIf="isTerapeuta()">

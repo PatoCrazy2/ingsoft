@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { AuthService } from '../../../../core/auth/auth.service';
 import { EjercicioCardComponent } from '../../../ejercicios/components/ejercicio-card/ejercicio-card.component';
 import { EjercicioService } from '../../../ejercicios/services/ejercicio.service';
 import { NuevaRutinaStateService } from '../../services/nueva-rutina-state';
@@ -28,6 +29,7 @@ import { PacienteListItem, PacienteService } from '../../services/paciente';
   styleUrl: './nueva-rutina.scss',
 })
 export class NuevaRutinaPage {
+  private readonly auth = inject(AuthService);
   private readonly pacientesApi = inject(PacienteService);
   private readonly ejerciciosApi = inject(EjercicioService);
   private readonly destroyRef = inject(DestroyRef);
@@ -44,11 +46,18 @@ export class NuevaRutinaPage {
     this._cargarPacientesTrasSesion();
   }
 
-  private _cargarPacientesTrasSesion(): void {
+  private async _cargarPacientesTrasSesion(): Promise<void> {
+    await this.auth.asegurarSesion();
+    const rol = this.auth.role();
+    if (rol !== 'Terapeuta' && rol !== 'Admin') {
+      await this.auth.loginByRole('Terapeuta');
+    }
+
     this.estado.cargandoPacientes.set(true);
     this.estado.errorPacientes.set(null);
     this.estado.errorEjercicios.set(null);
     this.estado.requiereInicioSesion.set(false);
+
     this.pacientesApi
       .listar()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -58,25 +67,32 @@ export class NuevaRutinaPage {
           this.estado.cargandoPacientes.set(false);
           this.estado.errorPacientes.set(null);
           const prev = this.estado.pacienteSeleccionado();
-          if (prev && 'paciente_id' in prev) {
+          if (prev?.paciente_id) {
             this.pacienteIdSeleccion = prev.paciente_id;
             this.alCambiarPaciente(this.pacienteIdSeleccion);
           }
         },
-        error: () => {
+        error: (err: HttpErrorResponse) => {
           this.estado.cargandoPacientes.set(false);
           this.pacientes = [];
-          this.estado.requiereInicioSesion.set(false);
+          if (err.status === 401 || err.status === 403) {
+            this.estado.requiereInicioSesion.set(true);
+            this.estado.errorPacientes.set(
+              'Sesión no válida para listar pacientes. Inicia sesión como Terapeuta o Administrador.',
+            );
+            return;
+          }
           this.estado.errorPacientes.set(
-            'No se pudo cargar el listado de pacientes. El servicio debería devolver datos mock si el fallo es de red; si ves este mensaje, revisa la consola del navegador.',
+            'No se pudo cargar el listado de pacientes. Comprueba que el backend esté en ejecución.',
           );
         },
       });
   }
 
   alCambiarPaciente(id: string | null): void {
-    this.pacienteIdSeleccion = id;
-    if (!id) {
+    const pacienteId = id && String(id).trim() ? String(id) : null;
+    this.pacienteIdSeleccion = pacienteId;
+    if (!pacienteId) {
       this.estado.pacienteSeleccionado.set(null);
       this.estado.ejerciciosPrefiltrados.set([]);
       this.estado.recomendacionesClinicas.set([]);
@@ -86,30 +102,40 @@ export class NuevaRutinaPage {
     this.estado.cargandoEjercicios.set(true);
     this.estado.errorEjercicios.set(null);
 
-    // 1. Obtener detalle completo del paciente
-    this.pacientesApi.obtenerDetalle(id).subscribe({
-      next: (paciente) => {
-        this.estado.pacienteSeleccionado.set(paciente);
-        
-        // 2. Obtener ejercicios pre-filtrados por el backend
-        this.ejerciciosApi.getEjerciciosPrefiltradosPorPaciente(id).subscribe({
-          next: (ejercicios) => {
-            // 3. Aplicar Cerebro Clínico (Frontend) para el matching avanzado
-            const sugeridos = this.ejerciciosApi.getRecomendacionesClinicas(paciente, ejercicios);
-            this.estado.recomendacionesClinicas.set(sugeridos);
-            this.estado.ejerciciosPrefiltrados.set(ejercicios);
-            this.estado.cargandoEjercicios.set(false);
-          },
-          error: () => {
-            this.estado.cargandoEjercicios.set(false);
-            this.estado.errorEjercicios.set('Error al cargar catálogo de ejercicios.');
-          }
-        });
-      },
-      error: () => {
-        this.estado.cargandoEjercicios.set(false);
-        this.estado.errorEjercicios.set('Error al obtener perfil clínico del paciente.');
-      }
-    });
+    this.pacientesApi
+      .obtenerDetalle(pacienteId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (paciente) => {
+          this.estado.pacienteSeleccionado.set(paciente);
+
+          this.ejerciciosApi
+            .getEjerciciosPrefiltradosPorPaciente(pacienteId)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+              next: (ejercicios) => {
+                const sugeridos = this.ejerciciosApi.getRecomendacionesClinicas(
+                  paciente,
+                  ejercicios,
+                );
+                this.estado.recomendacionesClinicas.set(sugeridos);
+                this.estado.ejerciciosPrefiltrados.set(ejercicios);
+                this.estado.cargandoEjercicios.set(false);
+              },
+              error: () => {
+                this.estado.cargandoEjercicios.set(false);
+                this.estado.errorEjercicios.set(
+                  'Error al cargar ejercicios sugeridos para este paciente.',
+                );
+              },
+            });
+        },
+        error: () => {
+          this.estado.cargandoEjercicios.set(false);
+          this.estado.errorEjercicios.set(
+            'Error al obtener el perfil clínico del paciente seleccionado.',
+          );
+        },
+      });
   }
 }

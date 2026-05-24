@@ -28,6 +28,15 @@ import { AuthService } from '../auth/auth.service';
               </a>
             </div>
 
+            <!-- Secciones para Paciente -->
+            <div class="nav-section" *ngIf="isPaciente()">
+              <p class="section-title">Mi rehabilitación</p>
+              <a routerLink="/ejercicios" routerLinkActive="active" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                <span>Catálogo de ejercicios</span>
+              </a>
+            </div>
+
             <!-- Secciones para Terapeuta / Admin -->
             <div class="nav-section" *ngIf="isTerapeuta() || isAdmin()">
               <p class="section-title">Clínica</p>
@@ -286,7 +295,7 @@ export class MainLayoutComponent {
   private readonly router = inject(Router);
 
   constructor() {
-    this.auth.asegurarTokenDemo();
+    void this.auth.asegurarSesion();
   }
 
   userRole = this.auth.role;

@@ -9,10 +9,16 @@ const STORAGE_KEY = 'rehabweb_token';
 const ROLE_KEY = 'rehabweb_role';
 
 /** Cuentas demo del `seed_demo` del API. */
-export const DEMO_CREDENTIALS = {
+export type DemoRole = 'Terapeuta' | 'Admin' | 'Paciente';
+
+export const DEMO_CREDENTIALS: Record<
+  DemoRole,
+  { email: string; password: string; role: DemoRole }
+> = {
   Terapeuta: { email: 'terapeuta@demo.rehab', password: 'demo12345', role: 'Terapeuta' },
   Admin: { email: 'admin@demo.rehab', password: 'demo12345', role: 'Admin' },
-  Paciente: { email: 'paciente@demo.rehab', password: 'demo12345', role: 'Paciente' }
+  /** Cuenta del seed_demo (paciente1@demo.rehab). */
+  Paciente: { email: 'paciente1@demo.rehab', password: 'demo12345', role: 'Paciente' },
 };
 
 @Injectable({ providedIn: 'root' })
@@ -33,6 +39,7 @@ export class AuthService {
   readonly ready = signal(false);
 
   private demoLoginEnCurso: Promise<void> | null = null;
+  private demoLoginRol: DemoRole | null = null;
 
   constructor() {
     if (!isPlatformBrowser(this.platformId)) {
@@ -40,48 +47,62 @@ export class AuthService {
       return;
     }
     const savedToken = localStorage.getItem(STORAGE_KEY);
-    const savedRole = localStorage.getItem(ROLE_KEY);
+    const savedRole = localStorage.getItem(ROLE_KEY) as DemoRole | null;
     if (savedToken) {
       this._token.set(savedToken);
       this._role.set(savedRole);
-      this.ready.set(true);
-    } else {
-      void this.loginByRole('Terapeuta').then(() => this.ready.set(true));
     }
+    this.ready.set(true);
   }
 
   /**
-   * Garantiza token demo antes de llamar al API.
+   * Garantiza sesión sin cambiar el rol elegido en landing.
+   * Si hay rol guardado, reautentica con esa cuenta; nunca fuerza Terapeuta.
    */
-  asegurarTokenDemo(): Promise<void> {
+  asegurarSesion(): Promise<void> {
     if (!isPlatformBrowser(this.platformId) || this._token()) {
       return Promise.resolve();
     }
-    
-    return this.loginByRole('Terapeuta');
+
+    const savedRole = localStorage.getItem(ROLE_KEY) as DemoRole | null;
+    if (savedRole && savedRole in DEMO_CREDENTIALS) {
+      return this.loginByRole(savedRole);
+    }
+
+    return Promise.resolve();
+  }
+
+  /** @deprecated Usar {@link asegurarSesion} para no sobrescribir el rol Paciente. */
+  asegurarTokenDemo(): Promise<void> {
+    return this.asegurarSesion();
   }
 
   /**
    * Login simulado por rol para la pantalla de entrada.
    */
-  async loginByRole(roleName: 'Terapeuta' | 'Admin' | 'Paciente'): Promise<void> {
-    if (this.demoLoginEnCurso) return this.demoLoginEnCurso;
-    
+  async loginByRole(roleName: DemoRole): Promise<void> {
+    if (this.demoLoginEnCurso && this.demoLoginRol === roleName) {
+      return this.demoLoginEnCurso;
+    }
+
     const creds = DEMO_CREDENTIALS[roleName];
+    this.setRole(creds.role);
+    this.demoLoginRol = roleName;
     this.demoLoginEnCurso = (async () => {
       try {
         await firstValueFrom(this.login(creds.email, creds.password));
         this.setRole(creds.role);
-      } catch (e) {
+      } catch {
         console.warn('API no disponible, usando modo demo offline');
         this.setToken('mock_token_' + roleName.toLowerCase());
         this.setRole(creds.role);
         this.sesionLista$.next();
       } finally {
         this.demoLoginEnCurso = null;
+        this.demoLoginRol = null;
       }
     })();
-    
+
     return this.demoLoginEnCurso;
   }
 
@@ -112,7 +133,7 @@ export class AuthService {
 
   setToken(token: string | null): void {
     if (isPlatformBrowser(this.platformId)) {
-      if (token && !token.startsWith('mock_token_')) {
+      if (token) {
         localStorage.setItem(STORAGE_KEY, token);
       } else {
         localStorage.removeItem(STORAGE_KEY);

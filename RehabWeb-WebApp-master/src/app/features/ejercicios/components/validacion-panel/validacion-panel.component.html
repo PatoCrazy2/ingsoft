@@ -1,0 +1,115 @@
+<div class="validation-panel">
+  <div class="panel-hero">
+    <div class="panel-hero__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        <path d="m9 12 2 2 4-4"></path>
+      </svg>
+    </div>
+    <div>
+      <h3 class="panel-title">Panel de validación</h3>
+      <p class="panel-desc">Tu revisión queda registrada para trazabilidad clínica.</p>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="val-form">
+    <div class="form-section">
+      <label class="form-label">¿Es apto para publicación?</label>
+      <div class="decision-grid">
+        <button
+          type="button"
+          class="decision-card decision-card--approve"
+          [class.decision-card--active]="decision === true"
+          (click)="seleccionarDecision(true)"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span class="decision-card__title">Aprobar</span>
+          <span class="decision-card__hint">Cumple criterios clínicos</span>
+        </button>
+        <button
+          type="button"
+          class="decision-card decision-card--reject"
+          [class.decision-card--active]="decision === false"
+          (click)="seleccionarDecision(false)"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          <span class="decision-card__title">Rechazar</span>
+          <span class="decision-card__hint">Requiere ajustes</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label" for="comentario">
+        Comentarios de revisión
+        @if (comentarioRequerido) {
+          <span class="form-label__required">*</span>
+        }
+      </label>
+      <textarea
+        id="comentario"
+        formControlName="comentario"
+        rows="4"
+        class="elegant-textarea"
+        [class.elegant-textarea--invalid]="form.get('comentario')?.invalid && form.get('comentario')?.touched"
+        placeholder="Describe hallazgos técnicos, contraindicaciones o mejoras sugeridas..."
+      ></textarea>
+      <p class="form-hint">
+        @if (comentarioRequerido) {
+          Obligatorio al rechazar. Mínimo 8 caracteres.
+        } @else {
+          Opcional al aprobar. Visible para el autor si se rechaza.
+        }
+      </p>
+    </div>
+
+    <button type="submit" class="btn-submit" [disabled]="form.invalid || enviando">
+      @if (enviando) {
+        <span class="btn-submit__spinner" aria-hidden="true"></span>
+        Enviando...
+      } @else {
+        Finalizar revisión
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="btn-icon" aria-hidden="true">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      }
+    </button>
+  </form>
+
+  @if (historial.length > 0) {
+    <div class="history-section">
+      <h4 class="history-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        Historial de revisiones
+        <span class="history-count">{{ historial.length }}</span>
+      </h4>
+      <ul class="history-timeline">
+        @for (v of historial; track v.id) {
+          <li class="history-item" [class.history-item--reject]="!v.es_valido">
+            <div class="history-item__dot" aria-hidden="true"></div>
+            <div class="history-item__body">
+              <div class="history-item__head">
+                <span class="status-badge" [class.status-badge--ok]="v.es_valido" [class.status-badge--no]="!v.es_valido">
+                  {{ v.es_valido ? 'Aprobado' : 'Rechazado' }}
+                </span>
+                <time class="item-date">{{ v.fecha_validacion | date:'dd MMM yyyy' }}</time>
+              </div>
+              @if (v.comentario) {
+                <p class="item-comment">{{ v.comentario }}</p>
+              }
+              <p class="item-author">{{ v.revisor_nombre || 'Revisor clínico' }}</p>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+</div>

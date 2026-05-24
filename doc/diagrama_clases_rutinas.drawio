@@ -1,0 +1,186 @@
+<mxfile host="app.diagrams.net" version="21.0.0">
+  <diagram name="Diagrama de Clases – Módulo Rutinas" id="cls_rutinas">
+    <mxGraphModel dx="1500" dy="900" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ── Título ─────────────────────────────────────────── -->
+        <mxCell id="2" value="Diagrama de clases" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#707e8c;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="580" y="10" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="" style="endArrow=none;strokeColor=#CCCCCC;strokeWidth=1;html=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="60" y="46" as="sourcePoint" />
+            <mxPoint x="1380" y="46" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════
+             Clase: AdministradorClinico
+             ══════════════════════════════════════════════════════ -->
+        <mxCell id="10" value="AdministradorClinico" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="65" width="210" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="10a" value="+int id&#xa;+string nombre&#xa;+string email&#xa;+string rol" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;fontSize=10;overflow=hidden;" vertex="1" parent="10">
+          <mxGeometry y="26" width="210" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="10b" value="+crearEjercicio()&#xa;+editarEjercicio()" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;fontSize=10;overflow=hidden;borderColor=#000000;border=1;" vertex="1" parent="10">
+          <mxGeometry y="94" width="210" height="36" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════
+             Clase: Terapeuta
+             ══════════════════════════════════════════════════════ -->
+        <mxCell id="20" value="Terapeuta" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="430" width="210" height="145" as="geometry" />
+        </mxCell>
+        <mxCell id="20a" value="+int id&#xa;+string nombre&#xa;+string especialidad&#xa;+string email" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;fontSize=10;overflow=hidden;" vertex="1" parent="20">
+          <mxGeometry y="26" width="210" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="20b" value="+validarEjercicio()&#xa;+prescribirRutina()&#xa;+verHistorialVersiones()" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;fontSize=10;overflow=hidden;" vertex="1" parent="20">
+          <mxGeometry y="94" width="210" height="51" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════
+             Clase: Ejercicio   (central)
+             ══════════════════════════════════════════════════════ -->
+        <mxCell id="30" value="Ejercicio" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="450" y="65" width="250" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="30a" value="+UUID id&#xa;+string nombre&#xa;+string descripcion&#xa;+string instrucciones&#xa;+string material_necesario&#xa;+string video_url&#xa;+string imagen_url&#xa;+string categoria&#xa;+enum dificultad&#xa;+enum estado&#xa;+string evidencia_cientifica&#xa;+date fecha_creacion&#xa;+date fecha_actualizacion" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;fontSize=10;overflow=hidden;" vertex="1" parent="30">
+          <mxGeometry y="26" width="250" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="30b" value="+publicar()&#xa;+actualizarEstado()" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;fontSize=10;overflow=hidden;" vertex="1" parent="30">
+          <mxGeometry y="266" width="250" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════
+             Clase: ValidacionEjercicio
+             ══════════════════════════════════════════════════════ -->
+        <mxCell id="40" value="ValidacionEjercicio" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="450" y="490" width="250" height="145" as="geometry" />
+        </mxCell>
+        <mxCell id="40a" value="+UUID id&#xa;+UUID ejercicio_id&#xa;+boolean es_valido&#xa;+string comentario&#xa;+date fecha_validacion&#xa;+string validado_por" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;fontSize=10;overflow=hidden;" vertex="1" parent="40">
+          <mxGeometry y="26" width="250" height="119" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════
+             Clase: Rutina
+             ══════════════════════════════════════════════════════ -->
+        <mxCell id="50" value="Rutina" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="840" y="65" width="210" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="50a" value="+UUID id&#xa;+string nombre&#xa;+UUID paciente_id&#xa;+UUID terapeuta_id&#xa;+date fecha_creacion" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;fontSize=10;overflow=hidden;" vertex="1" parent="50">
+          <mxGeometry y="26" width="210" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="50b" value="+agregarEjercicio()&#xa;+eliminarEjercicio()" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;fontSize=10;overflow=hidden;" vertex="1" parent="50">
+          <mxGeometry y="126" width="210" height="34" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════
+             Clase: RutinaEjercicio
+             ══════════════════════════════════════════════════════ -->
+        <mxCell id="60" value="RutinaEjercicio" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="840" y="340" width="210" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="60a" value="+UUID rutina_id&#xa;+UUID ejercicio_id&#xa;+int series&#xa;+int repeticiones&#xa;+string frecuencia" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;fontSize=10;overflow=hidden;" vertex="1" parent="60">
+          <mxGeometry y="26" width="210" height="84" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════
+             Clase: Paciente
+             ══════════════════════════════════════════════════════ -->
+        <mxCell id="70" value="Paciente" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="65" width="210" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="70a" value="+UUID id&#xa;+string nombre&#xa;+date fechaNacimiento&#xa;+string diagnostico" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;fontSize=10;overflow=hidden;" vertex="1" parent="70">
+          <mxGeometry y="26" width="210" height="104" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════
+             RELACIONES
+             ══════════════════════════════════════════════════════ -->
+
+        <!-- AdminClinico crea (1) → (0..*) Ejercicio  -->
+        <mxCell id="r1" value="crea" style="endArrow=open;endFill=0;html=1;startArrow=none;fontSize=10;entryX=0;entryY=0.15;entryDx=0;entryDy=0;" edge="1" source="10" target="30" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r1_lbl1" value="1" style="resizable=0;html=1;align=left;verticalAlign=bottom;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" connectable="0" parent="r1">
+          <mxGeometry x="-0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="r1_lbl2" value="0..*" style="resizable=0;html=1;align=right;verticalAlign=bottom;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" connectable="0" parent="r1">
+          <mxGeometry x="0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- Terapeuta valida (1) → (0..*) ValidacionEjercicio -->
+        <mxCell id="r2" value="valida" style="endArrow=open;endFill=0;html=1;fontSize=10;" edge="1" source="20" target="40" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r2_lbl1" value="1" style="resizable=0;html=1;align=left;verticalAlign=bottom;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" connectable="0" parent="r2">
+          <mxGeometry x="-0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="r2_lbl2" value="0..*" style="resizable=0;html=1;align=right;verticalAlign=bottom;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" connectable="0" parent="r2">
+          <mxGeometry x="0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- Terapeuta crea (1) → (0..*) Rutina -->
+        <mxCell id="r3" value="crea" style="endArrow=open;endFill=0;html=1;fontSize=10;" edge="1" source="20" target="50" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="165" y="590" />
+              <mxPoint x="945" y="590" />
+              <mxPoint x="945" y="225" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Ejercicio tiene (composición) → ValidacionEjercicio -->
+        <mxCell id="r4" value="contiene" style="endArrow=open;endFill=0;html=1;startArrow=diamond;startFill=1;fontSize=10;" edge="1" source="30" target="40" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r4_lbl1" value="1" style="resizable=0;html=1;align=left;verticalAlign=bottom;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" connectable="0" parent="r4">
+          <mxGeometry x="-0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="r4_lbl2" value="0..*" style="resizable=0;html=1;align=right;verticalAlign=bottom;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" connectable="0" parent="r4">
+          <mxGeometry x="0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- Rutina tiene (composición) → RutinaEjercicio -->
+        <mxCell id="r5" value="compone" style="endArrow=open;endFill=0;html=1;startArrow=diamond;startFill=1;fontSize=10;" edge="1" source="50" target="60" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r5_lbl1" value="1" style="resizable=0;html=1;align=left;verticalAlign=bottom;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" connectable="0" parent="r5">
+          <mxGeometry x="-0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="r5_lbl2" value="1..*" style="resizable=0;html=1;align=right;verticalAlign=bottom;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" connectable="0" parent="r5">
+          <mxGeometry x="0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- RutinaEjercicio referencia Ejercicio -->
+        <mxCell id="r6" value="referencia" style="endArrow=open;endFill=0;html=1;dashed=1;fontSize=10;" edge="1" source="60" target="30" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="840" y="395" />
+              <mxPoint x="700" y="395" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Rutina asignada a Paciente -->
+        <mxCell id="r7" value="asignada a" style="endArrow=open;endFill=0;html=1;fontSize=10;" edge="1" source="50" target="70" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r7_lbl1" value="0..*" style="resizable=0;html=1;align=left;verticalAlign=bottom;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" connectable="0" parent="r7">
+          <mxGeometry x="-0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="r7_lbl2" value="1" style="resizable=0;html=1;align=right;verticalAlign=bottom;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" connectable="0" parent="r7">
+          <mxGeometry x="0.8" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

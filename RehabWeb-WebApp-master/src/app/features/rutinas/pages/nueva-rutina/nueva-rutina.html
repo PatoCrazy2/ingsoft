@@ -12,14 +12,25 @@
         <select
           id="paciente-select"
           class="form-input"
+          [disabled]="estado.cargandoPacientes()"
           [(ngModel)]="pacienteIdSeleccion"
           (ngModelChange)="alCambiarPaciente($event)"
         >
           <option [ngValue]="null">Seleccionar paciente...</option>
-          <option *ngFor="let p of pacientes" [value]="p.paciente_id">
+          <option *ngFor="let p of pacientes" [ngValue]="p.paciente_id">
             {{ p.nombre_completo }}
           </option>
         </select>
+        <p class="selector-hint" *ngIf="estado.cargandoPacientes()">Cargando pacientes...</p>
+        <p class="selector-error" *ngIf="estado.errorPacientes() as err">{{ err }}</p>
+        <button
+          type="button"
+          class="btn-link-retry"
+          *ngIf="estado.errorPacientes()"
+          (click)="cargarPacientes()"
+        >
+          Reintentar
+        </button>
       </div>
 
       <button

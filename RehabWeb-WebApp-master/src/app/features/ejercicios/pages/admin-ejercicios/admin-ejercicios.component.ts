@@ -391,7 +391,7 @@ export class AdminEjerciciosPage implements OnInit {
   }
 
   private recargar(): void {
-    void this.auth.asegurarTokenDemo().then(() => {
+    void this.auth.asegurarSesion().then(() => {
       this.ejercicioService.getEjercicios().subscribe();
     });
   }

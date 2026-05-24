@@ -1,0 +1,68 @@
+<div class="validation-page animate-in">
+  <header class="val-header">
+    <a routerLink="/ejercicios/admin" class="val-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Volver a gestión
+    </a>
+
+    <div class="val-header__main">
+      <span class="val-kicker">Revisión por pares</span>
+      <h1 class="val-title">Validación clínica</h1>
+      <p class="val-subtitle">
+        Revisa el contenido terapéutico y decide si cumple los criterios de calidad para publicación.
+      </p>
+    </div>
+
+    @if (ejercicio(); as ej) {
+      <div class="val-exercise-chip">
+        <span class="val-exercise-chip__label">Ejercicio en revisión</span>
+        <strong class="val-exercise-chip__name">{{ ej.nombre }}</strong>
+        <span class="val-exercise-chip__meta">{{ ej.categoria }} · {{ ej.dificultad }}</span>
+      </div>
+    }
+  </header>
+
+  <div class="val-layout">
+    <section class="val-preview" aria-label="Vista previa del ejercicio">
+      <div class="val-preview__label">
+        <span class="val-step">1</span>
+        <span>Revisar contenido</span>
+      </div>
+
+      @if (cargando()) {
+        <div class="skeleton-preview">
+          <div class="skeleton-preview__bar skeleton-preview__bar--lg"></div>
+          <div class="skeleton-preview__bar"></div>
+          <div class="skeleton-preview__bar"></div>
+          <div class="skeleton-preview__media"></div>
+        </div>
+      } @else if (ejercicio(); as ej) {
+        <div class="preview-card">
+          <app-ejercicio-preview [ejercicio]="ej"></app-ejercicio-preview>
+        </div>
+      } @else {
+        <div class="val-empty">
+          <p>No se encontró el ejercicio solicitado.</p>
+          <a routerLink="/ejercicios/admin" class="val-empty__link">Ir al panel de administración</a>
+        </div>
+      }
+    </section>
+
+    <aside class="val-sidebar" aria-label="Panel de validación">
+      <div class="val-sidebar__sticky">
+        <div class="val-preview__label val-preview__label--panel">
+          <span class="val-step">2</span>
+          <span>Registrar decisión</span>
+        </div>
+        <app-validacion-panel
+          [historial]="ejercicio()?.historial_validaciones ?? []"
+          [enviando]="enviando()"
+          (validated)="onValidate($event)"
+        />
+      </div>
+    </aside>
+  </div>
+</div>

@@ -70,7 +70,7 @@ export class BibliotecaEjerciciosPage {
   }
 
   cargar(): void {
-    void this.auth.asegurarTokenDemo().then(() => {
+    void this.auth.asegurarSesion().then(() => {
       this.cargarCategorias();
       this.ejercicioService
         .getEjercicios({ estado: 'PUBLICADO' })

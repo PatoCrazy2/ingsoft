@@ -1,0 +1,103 @@
+<mxfile host="app.diagrams.net" version="21.0.0">
+  <diagram name="Arquitectura – Módulo Rutinas" id="arch_rutinas">
+    <mxGraphModel dx="1200" dy="800" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ══════════════════════════════════════════════════════
+             CAPA 1 – Frontend Angular 20   (#1B4332)
+             ══════════════════════════════════════════════════════ -->
+        <mxCell id="10" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1B4332;strokeColor=#1B4332;" vertex="1" parent="1">
+          <mxGeometry x="60" y="40" width="900" height="155" as="geometry" />
+        </mxCell>
+        <!-- Título capa frontend -->
+        <mxCell id="11" value="&lt;b&gt;Frontend — Angular 20&lt;/b&gt;" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontColor=#FFFFFF;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="75" y="50" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="localhost:4200" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#AADDCC;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="75" y="70" width="180" height="18" as="geometry" />
+        </mxCell>
+        <!-- Sub-módulos frontend -->
+        <mxCell id="13" value="Biblioteca&lt;br&gt;de Ejercicios" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="80" y="100" width="140" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="Administración" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="238" y="100" width="140" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="Validación" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="396" y="100" width="140" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="Detalle /&lt;br&gt;Preview" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="554" y="100" width="140" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="Nueva Rutina" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="712" y="100" width="140" height="82" as="geometry" />
+        </mxCell>
+
+        <!-- ── Flecha entre capa 1 y 2 ──────────────────────────── -->
+        <mxCell id="50" value="HTTP / REST · CORS enabled" style="endArrow=block;endFill=1;startArrow=block;startFill=1;html=1;strokeColor=#888888;fontColor=#666666;fontSize=9;align=center;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="10" target="60" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════
+             CAPA 2 – Backend Django REST Framework   (#3A3C74)
+             ══════════════════════════════════════════════════════ -->
+        <mxCell id="60" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#3A3C74;strokeColor=#3A3C74;" vertex="1" parent="1">
+          <mxGeometry x="60" y="255" width="900" height="165" as="geometry" />
+        </mxCell>
+        <mxCell id="61" value="&lt;b&gt;Backend — Django REST Framework&lt;/b&gt;" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontColor=#FFFFFF;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="75" y="262" width="360" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="62" value="127.0.0.1:8000" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#AAAADD;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="75" y="282" width="180" height="18" as="geometry" />
+        </mxCell>
+        <!-- Endpoints backend -->
+        <mxCell id="63" value="GET · POST&lt;br&gt;/api/ejercicios/&lt;br&gt;&lt;i&gt;EjercicioViewSet&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="80" y="308" width="200" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="64" value="GET · PUT · DELETE&lt;br&gt;/api/ejercicios/:id/&lt;br&gt;&lt;i&gt;EjercicioViewSet&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="298" y="308" width="220" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="65" value="GET · POST&lt;br&gt;/api/ejercicios/:id/validaciones/&lt;br&gt;&lt;i&gt;ValidacionViewSet&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="536" y="308" width="240" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="66" value="GET&lt;br&gt;/api/rutinas/&lt;br&gt;&lt;i&gt;RutinaViewSet&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="794" y="308" width="150" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ── Flecha entre capa 2 y 3 ──────────────────────────── -->
+        <mxCell id="51" value="ORM / SQL" style="endArrow=block;endFill=1;startArrow=block;startFill=1;html=1;strokeColor=#888888;fontColor=#666666;fontSize=9;align=center;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="60" target="70" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════
+             CAPA 3 – Base de Datos MySQL 8.0   (#7B4527)
+             ══════════════════════════════════════════════════════ -->
+        <mxCell id="70" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7B4527;strokeColor=#7B4527;" vertex="1" parent="1">
+          <mxGeometry x="60" y="480" width="900" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="71" value="&lt;b&gt;Base de datos — MySQL 8.0&lt;/b&gt;" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontColor=#FFFFFF;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="75" y="488" width="340" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="72" value="rehab_db" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#DDBB99;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="75" y="508" width="180" height="18" as="geometry" />
+        </mxCell>
+        <!-- Tablas BD -->
+        <mxCell id="73" value="tabla: ejercicio" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="80" y="532" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="74" value="tabla: validacion_ejercicio" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="298" y="532" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="75" value="tabla: rutina_ejercicio" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="536" y="532" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="76" value="tabla: rutina" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;fontSize=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="754" y="532" width="190" height="60" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

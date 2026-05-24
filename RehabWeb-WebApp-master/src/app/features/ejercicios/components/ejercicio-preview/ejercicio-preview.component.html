@@ -1,0 +1,136 @@
+@if (ejercicio) {
+  <article class="preview animate-in">
+    <section class="preview__media" aria-label="Multimedia del ejercicio">
+      <button type="button" class="preview__back" (click)="goBack()" title="Regresar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+      </button>
+
+      @if (tieneVideo) {
+        <video
+          class="preview__video"
+          [src]="urlVideo"
+          controls
+          playsinline
+          [poster]="ejercicio.imagen_url || undefined"
+        >
+          Tu navegador no soporta reproducción de video.
+        </video>
+      } @else {
+        <img
+          class="preview__image"
+          [src]="ejercicio.imagen_url || 'assets/placeholder-exercise.jpg'"
+          [alt]="ejercicio.nombre"
+        />
+      }
+
+      <div class="preview__media-badges">
+        <span class="chip chip--category">{{ ejercicio.categoria }}</span>
+        <span class="chip chip--state">{{ ejercicio.estado }}</span>
+      </div>
+    </section>
+
+    <div class="preview__body">
+      <header class="preview__header">
+        <div class="preview__header-main">
+          <div class="preview__meta">
+            <span class="difficulty" [class]="'difficulty--' + dificultadClass">
+              <span class="difficulty__dot" aria-hidden="true"></span>
+              {{ ejercicio.dificultad }}
+            </span>
+            @if (ejercicio.creador_nombre) {
+              <span class="preview__author">Por {{ ejercicio.creador_nombre }}</span>
+            }
+          </div>
+          <h1 class="preview__title">{{ ejercicio.nombre }}</h1>
+        </div>
+
+        <div class="preview__stats">
+          <div class="stat-chip">
+            <span class="stat-chip__value">{{ ejercicio.series ?? 3 }}</span>
+            <span class="stat-chip__label">series</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-chip__value">{{ ejercicio.reps || '10' }}</span>
+            <span class="stat-chip__label">reps</span>
+          </div>
+          <div class="stat-chip stat-chip--rating">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span class="stat-chip__value">{{ puntuacionMostrada }}</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="preview__grid">
+        <div class="preview__main">
+          <section class="block">
+            <h2 class="block__label">Descripción técnica</h2>
+            <p class="block__text">{{ ejercicio.descripcion }}</p>
+          </section>
+
+          <section class="block">
+            <h2 class="block__label">Protocolo de ejecución</h2>
+            @if (!(ejercicio.instrucciones ?? '').trim()) {
+              <p class="block__note">Pasos orientativos según parámetros del ejercicio.</p>
+            }
+            <ol class="protocol-list">
+              @for (paso of pasosProtocolo; track $index) {
+                <li class="protocol-list__item">
+                  <span class="protocol-list__num">{{ $index + 1 }}</span>
+                  <span class="protocol-list__text">{{ paso }}</span>
+                </li>
+              }
+            </ol>
+          </section>
+        </div>
+
+        <aside class="preview__aside">
+          <div class="side-card">
+            <div class="side-card__head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                <path d="M2 8h16v8H2z"></path>
+                <line x1="6" y1="12" x2="14" y2="12"></line>
+              </svg>
+              <span>Equipamiento</span>
+            </div>
+            <p class="side-card__body">
+              {{ ejercicio.material_necesario?.trim() || 'Sin equipamiento especial' }}
+            </p>
+          </div>
+
+          @if (ejercicio.evidencia_cientifica) {
+            <div class="side-card side-card--science">
+              <div class="side-card__head">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                <span>Base científica</span>
+              </div>
+              <p class="side-card__body">{{ ejercicio.evidencia_cientifica }}</p>
+            </div>
+          }
+
+          <div class="reviewer">
+            <div class="reviewer__avatar" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div>
+              <p class="reviewer__name">Revisión clínica</p>
+              <p class="reviewer__role">Contenido validado por pares</p>
+            </div>
+          </div>
+
+          <a routerLink="/ejercicios" class="link-biblioteca">Volver a biblioteca</a>
+        </aside>
+      </div>
+    </div>
+  </article>
+}

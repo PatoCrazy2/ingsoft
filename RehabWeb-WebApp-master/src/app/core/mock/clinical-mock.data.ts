@@ -1,4 +1,7 @@
-import { PacienteListItem } from '../../features/rutinas/services/paciente';
+import {
+  PacienteDetalleDto,
+  PacienteListItem,
+} from '../../features/rutinas/services/paciente';
 import { Ejercicio } from '../../features/ejercicios/models/ejercicio.model';
 
 const now = () => new Date().toISOString();
@@ -24,6 +27,32 @@ export const MOCK_PACIENTES: PacienteListItem[] = [
     estado: 'ACTIVO',
   },
 ];
+
+/** Detalle clínico demo cuando el API no responde. */
+export function mockPacienteDetalle(pacienteId: string): PacienteDetalleDto | null {
+  const base = MOCK_PACIENTES.find((p) => p.paciente_id === pacienteId);
+  if (!base) return null;
+  return {
+    ...base,
+    fecha_nacimiento: '1985-06-15',
+    perfil_clinico: {
+      id: 'mock-perfil-' + pacienteId,
+      diagnostico_principal: 'ACV — seguimiento ambulatorio (demo)',
+      historial_medico: 'Datos de demostración locales.',
+      nivel_movilidad: '3',
+      restricciones: 'Evitar fatiga extrema',
+      territorio_acv: 'HEMISFERIO_DERECHO',
+    },
+    evaluacion_prioritaria: {
+      id: 'mock-eval-' + pacienteId,
+      fecha_evaluacion: now(),
+      notas_evaluacion: 'Evaluación inicial de demostración.',
+      metricas_objetivas: { nivel_movilidad: '3' },
+      es_evaluacion_inicial: true,
+      terapeuta_evaluador: 'Terapeuta Demo',
+    },
+  };
+}
 
 function ej(
   id: string,

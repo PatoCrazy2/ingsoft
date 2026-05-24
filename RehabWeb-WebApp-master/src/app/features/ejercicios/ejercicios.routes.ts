@@ -6,6 +6,8 @@ import { EjercicioDetailPage } from './pages/ejercicio-detail/ejercicio-detail.c
 import { EjercicioValidationPage } from './pages/ejercicio-validation/ejercicio-validation.component';
 
 export const EJERCICIOS_ROUTES: Routes = [
+  /** Enlaces antiguos del dashboard apuntaban a /ejercicios/biblioteca */
+  { path: 'biblioteca', pathMatch: 'full', redirectTo: '' },
   {
     path: '',
     component: BibliotecaEjerciciosPage,

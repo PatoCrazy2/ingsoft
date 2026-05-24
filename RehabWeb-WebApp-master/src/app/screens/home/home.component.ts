@@ -46,9 +46,17 @@ export class HomeComponent implements OnInit {
   private loadDashboardData() {
     this.loading.set(true);
     
+    const filtroCatalogo = this.isPaciente()
+      ? { estado: 'PUBLICADO' as const }
+      : undefined;
+
     const calls = {
-      ejercicios: this.ejerciciosService.getEjercicios().pipe(catchError(() => of([]))),
-      pacientes: this.isTerapeuta() ? this.pacienteService.listar().pipe(catchError(() => of([]))) : of([])
+      ejercicios: this.ejerciciosService
+        .getEjercicios(filtroCatalogo)
+        .pipe(catchError(() => of([]))),
+      pacientes: this.isTerapeuta()
+        ? this.pacienteService.listar().pipe(catchError(() => of([])))
+        : of([]),
     };
 
     forkJoin(calls).subscribe({
@@ -58,9 +66,11 @@ export class HomeComponent implements OnInit {
 
         this.stats.set({
           totalEjercicios: ejercicios.length,
-          pendientes: ejercicios.filter(e => e.estado === 'PENDIENTE_VALIDACION').length,
+          pendientes: ejercicios.filter((e) => e.estado === 'PENDIENTE_VALIDACION').length,
           pacientesActivos: pacientes.length,
-          rutinasAsignadas: Math.floor(pacientes.length * 0.8) // Mocked stat
+          rutinasAsignadas: this.isPaciente()
+            ? 1
+            : Math.floor(pacientes.length * 0.8),
         });
         this.loading.set(false);
       },
